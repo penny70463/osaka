@@ -1,0 +1,7 @@
+@import './map.scss';
+@import './variables.scss';
+body {  
+    background-color: $priority-bk-color;
+    font-family: Microsoft JhengHei;
+    color:$text-color;
+}
