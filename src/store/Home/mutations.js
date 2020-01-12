@@ -29,6 +29,6 @@ export const mutations = {
 		state.queryDistance = value;
 	},
 	setDestinations(state, location) {
-		state.destinations = location;
+		state.destinations[location.idx]=location.location
 	},
 };

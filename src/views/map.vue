@@ -59,6 +59,9 @@ export default {
 			'destinations',
 		]
 		),
+		...mapMutations('Home',[
+			'setDestinations',
+		]),
 		...mapGetters('Home', [
 			'convertOsakaPass',
 		]),
@@ -83,10 +86,12 @@ export default {
 			this.resetCenter();
 		},
 		requests() {
+			console.log('watchReq')
 			this.initMap();
 			this.passReq();
 		},
 		queryStringChange() {
+			console.log('querystring')
 			this.passReq();
 		},
 		currPosition() {
@@ -167,26 +172,44 @@ export default {
 				await this.getPlaces(req, test(req));
 			}
 		},
-		test(elm, idx) {
+		getInfoFromQuery(elm, idx) {
 			let service = new google.maps.places.PlacesService(this.map);
 			service.findPlaceFromQuery({ query: elm,
-				fields: ['name', 'geometry', 'formatted_address'] }, this.test2(idx));
+				fields: ['name', 'geometry', 'formatted_address'] }, this.fieldResult(idx));
 		},
-		test2(idx) {
-			//destinations.push(results[0].geometry.location);
-			return (results, status)=>{
-				console.log(results[0].geometry.location, idx);
+		fieldResult(idx) {
+			return async (results, status)=>{
+				await status==='OK' ? 
+				this.$store.commit('Home/setDestinations',{idx,location:results[0].geometry.location}): 
+				this.$store.commit('Home/setDestinations',{idx,location:null})	
 			};
+		},
+		getDistance() {
+			let service = new google.maps.DistanceMatrixService();
+			service.getDistanceMatrix({
+				origins: this.destinations.filter(elm=>elm!=null),
+				destinations: this.destinations.filter(elm=>elm!=null),
+				travelMode: 'DRIVING',
+				// transitOptions: TransitOptions,
+				// drivingOptions: DrivingOptions,
+				// unitSystem: UnitSystem,
+				// avoidHighways: Boolean,
+				// avoidTolls: Boolean,
+			},this.distanceResults)
+		},
+		distanceResults(response,status) {
+			console.log(response,status)
 		},
 		//經緯度create Marker
 		async currMarker() {
 			let temp = [];
+			//all places
 			Object.values(this.osakaPass).forEach(elm=>{
 				elm.forEach(el=>{
 					temp = temp.concat(el);
 				});
 			});
-
+			//current marker
 			let marker = new google.maps.Marker({
           				map: this.map,
 				  		position: new google.maps.LatLng(this.currPosition.lat, this.currPosition.lng),
@@ -200,10 +223,11 @@ export default {
 			this.resetCenter(this.currPosition.lat, this.currPosition.lng);
 			let originPosition = new google.maps.LatLng(this.currPosition.lat, this.currPosition.lng);
 			
-			
-			temp.forEach((elm, idx)=>{
-				this.test(elm, idx);
+			//query for all places
+			await temp.forEach((elm, idx)=>{
+				this.getInfoFromQuery(elm, idx);
 			});
+			await this.getDistance();
 		},
 	},
 };
