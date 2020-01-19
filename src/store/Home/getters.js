@@ -25,6 +25,7 @@ export default {
 				},
 				//1為query type
 				type: 1  });
+				
 			osakaPass['1'].forEach(elm=>{
 				tempList.push( 
 					{ queryObj: {

@@ -85,23 +85,24 @@ export default {
 		center(val) {
 			this.resetCenter();
 		},
-		requests() {
-			console.log('watchReq')
-			this.initMap();
-			this.passReq();
-		},
-		queryStringChange() {
-			console.log('querystring')
-			this.passReq();
-		},
-		currPosition() {
-			this.initMap();
-			this.currMarker();
-		},
+		// requests() {
+		// 	console.log('watchReq')
+		// 	this.initMap();
+		// 	this.passReq();
+		// },
+		// queryStringChange() {
+		// 	console.log('querystring')
+		// 	this.passReq();
+		// },
+		// currPosition() {
+		// 	this.initMap();
+		// 	this.currMarker();
+		// },
 	},
 	mounted() {
-		this.initMap();
-		this.passReq();
+		 this.initMap();
+		// this.passReq();
+		this.defaultSetting();
 	},
 	methods: {
 		...mapActions('Home', [
@@ -173,32 +174,39 @@ export default {
 			}
 		},
 		getInfoFromQuery(elm, idx) {
+			console.log('getInfoFromQuery')
 			let service = new google.maps.places.PlacesService(this.map);
 			service.findPlaceFromQuery({ query: elm,
 				fields: ['name', 'geometry', 'formatted_address'] }, this.fieldResult(idx));
 		},
 		fieldResult(idx) {
 			return async (results, status)=>{
+				console.log(idx,results,status)
 				await status==='OK' ? 
-				this.$store.commit('Home/setDestinations',{idx,location:results[0].geometry.location}): 
-				this.$store.commit('Home/setDestinations',{idx,location:null})	
+				this.$store.commit('Home/setDestinations',{ idx, location:results[0].geometry.location}): 
+				this.$store.commit('Home/setDestinations',{ idx, location:null})	
+				this.getDistance();
 			};
 		},
 		getDistance() {
-			let service = new google.maps.DistanceMatrixService();
-			service.getDistanceMatrix({
-				origins: this.destinations.filter(elm=>elm!=null),
-				destinations: this.destinations.filter(elm=>elm!=null),
-				travelMode: 'DRIVING',
-				// transitOptions: TransitOptions,
-				// drivingOptions: DrivingOptions,
-				// unitSystem: UnitSystem,
-				// avoidHighways: Boolean,
-				// avoidTolls: Boolean,
-			},this.distanceResults)
+			console.log(this.destinations,'destinations')
+			//let service = new google.maps.DistanceMatrixService();
+			
+			// service.getDistanceMatrix({
+				   
+			// 	// origins: this.destinations.filter(elm=>elm!=null),
+			// 	// destinations: this.destinations.filter(elm=>elm!=null),
+			// 	travelMode: 'DRIVING',
+			// 	// transitOptions: TransitOptions,
+			// 	// drivingOptions: DrivingOptions,
+			// 	// unitSystem: UnitSystem,
+			// 	// avoidHighways: Boolean,
+			// 	// avoidTolls: Boolean,
+			// },(response,status)=>{console.log('getdistance',response,status)})
+			
 		},
 		distanceResults(response,status) {
-			console.log(response,status)
+			console.log('distanceResults',response,status)
 		},
 		//經緯度create Marker
 		async currMarker() {
@@ -210,24 +218,37 @@ export default {
 				});
 			});
 			//current marker
-			let marker = new google.maps.Marker({
-          				map: this.map,
-				  		position: new google.maps.LatLng(this.currPosition.lat, this.currPosition.lng),
-			});
-			google.maps.event.addListener(marker, 'click', function() {
-				let infowindow = new google.maps.InfoWindow({
-				});
-				infowindow.setContent(`your position`);
-				infowindow.open(this.map, marker);
-			});
-			this.resetCenter(this.currPosition.lat, this.currPosition.lng);
-			let originPosition = new google.maps.LatLng(this.currPosition.lat, this.currPosition.lng);
+			// let marker = new google.maps.Marker({
+          	// 			map: this.map,
+			// 	  		position: new google.maps.LatLng(this.currPosition.lat, this.currPosition.lng),
+			// });
+			// google.maps.event.addListener(marker, 'click', function() {
+			// 	let infowindow = new google.maps.InfoWindow({
+			// 	});
+			// 	infowindow.setContent(`your position`);
+			// 	infowindow.open(this.map, marker);
+			// });
+			// this.resetCenter(this.currPosition.lat, this.currPosition.lng);
+			// let originPosition = new google.maps.LatLng(this.currPosition.lat, this.currPosition.lng);
 			
 			//query for all places
 			await temp.forEach((elm, idx)=>{
 				this.getInfoFromQuery(elm, idx);
 			});
 			await this.getDistance();
+		},
+		async defaultSetting() {
+			//取得各地點資訊
+			let temp = [];
+			Object.values(this.osakaPass).forEach(elm=>{
+				elm.forEach(el=>{
+					temp = temp.concat(el);
+				});
+			});
+			await temp.forEach((elm, idx)=>{
+				this.getInfoFromQuery(elm, idx);
+			});
+			
 		},
 	},
 };

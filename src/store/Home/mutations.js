@@ -1,7 +1,7 @@
 import { updateField } from 'vuex-map-fields';
 
 export const state = {
-	passCategory: '1',
+	passCategory: '4',
 	queryString: '',
 	tempQueryString: '',
 	markUrl: '',

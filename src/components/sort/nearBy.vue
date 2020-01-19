@@ -88,6 +88,7 @@ export default {
 			'getAttractionList',
 			'queryStringLocations',
 		]),
+		//下拉提示選單
 		fetchQuerySuggestion(string, cb) {
 			let temp = [];
 			Object.values(this.osakaPass).forEach(elm=>{
