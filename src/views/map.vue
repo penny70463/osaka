@@ -100,7 +100,7 @@ export default {
 		// },
 	},
 	mounted() {
-		 this.initMap();
+		this.initMap();
 		// this.passReq();
 		this.defaultSetting();
 	},
@@ -174,40 +174,49 @@ export default {
 			}
 		},
 		getInfoFromQuery(elm, idx) {
-			console.log('getInfoFromQuery')
 			let service = new google.maps.places.PlacesService(this.map);
 			service.findPlaceFromQuery({ query: elm,
 				fields: ['name', 'geometry', 'formatted_address'] }, this.fieldResult(idx));
 		},
 		fieldResult(idx) {
 			return async (results, status)=>{
-				console.log(idx,results,status)
-				await status==='OK' ? 
-				this.$store.commit('Home/setDestinations',{ idx, location:results[0].geometry.location}): 
-				this.$store.commit('Home/setDestinations',{ idx, location:null})	
+				for(let i=0;i<this.$store.state.Home.placesQty; i++) {
+					if( status==='OK' && i==idx ) {
+						this.$store.commit('Home/setDestinations',{info: { idx, location:{lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng()}, name: results[0].name, address:results[0].formatted_address},idx:idx})
+					} else if (status!=='OK') {
+						this.$store.commit('Home/setDestinations',{info:{ idx, location:null, name: null, address: null,},idx:idx})
+					}
+					
+				}
 				this.getDistance();
 			};
 		},
 		getDistance() {
-			console.log(this.destinations,'destinations')
-			//let service = new google.maps.DistanceMatrixService();
+			console.log(this.destinations,'destinations',this.currentPosition)
+			function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+			var R = 6371; // Radius of the earth in km
+			var dLat = deg2rad(lat2-lat1);  // deg2rad below
+			var dLon = deg2rad(lon2-lon1); 
+			var a = 
+				Math.sin(dLat/2) * Math.sin(dLat/2) +
+				Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+				Math.sin(dLon/2) * Math.sin(dLon/2)
+				; 
+			var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+			var d = R * c; // Distance in km
+			console.log(d,'d')
+			return d;
 			
-			// service.getDistanceMatrix({
-				   
-			// 	// origins: this.destinations.filter(elm=>elm!=null),
-			// 	// destinations: this.destinations.filter(elm=>elm!=null),
-			// 	travelMode: 'DRIVING',
-			// 	// transitOptions: TransitOptions,
-			// 	// drivingOptions: DrivingOptions,
-			// 	// unitSystem: UnitSystem,
-			// 	// avoidHighways: Boolean,
-			// 	// avoidTolls: Boolean,
-			// },(response,status)=>{console.log('getdistance',response,status)})
-			
+			}
+
+			function deg2rad(deg) {
+			return deg * (Math.PI/180)
+			}
+			this.destinations.forEach(elm=>{
+				getDistanceFromLatLonInKm(elm.location.lat,elm.location.lng,this.currentPosition.lat,this.currentPosition.lng)
+			})
 		},
-		distanceResults(response,status) {
-			console.log('distanceResults',response,status)
-		},
+		
 		//經緯度create Marker
 		async currMarker() {
 			let temp = [];
@@ -245,6 +254,7 @@ export default {
 					temp = temp.concat(el);
 				});
 			});
+			await this.$store.commit('Home/setPlacesQty',temp.length)
 			await temp.forEach((elm, idx)=>{
 				this.getInfoFromQuery(elm, idx);
 			});
