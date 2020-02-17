@@ -11,7 +11,7 @@
 import { mapActions, mapState, mapGetters, mapMutations } from 'vuex';
 import { mapFields } from 'vuex-map-fields';
 import { osakaPass } from '../dummy_data/dataList';
-
+import bus from '../assets/scripts/eventBus'
 export default {
 	props: {
 		center: {
@@ -65,9 +65,7 @@ export default {
 		...mapGetters('Home', [
 			'convertOsakaPass',
 		]),
-		queryStringChange() {
-			return this.queryString;
-		},
+		
 		currPosition() {
 			return this.currentPosition;
 		},
@@ -90,19 +88,15 @@ export default {
 		// 	this.initMap();
 		// 	this.passReq();
 		// },
-		// queryStringChange() {
-		// 	console.log('querystring')
-		// 	this.passReq();
-		// },
-		// currPosition() {
-		// 	this.initMap();
-		// 	this.currMarker();
-		// },
+		
 	},
 	mounted() {
 		this.initMap();
 		// this.passReq();
 		this.defaultSetting();
+		bus.$on('queryString',event=>{
+			this.getInfoFromQuery(this.queryString,undefined)
+		})
 	},
 	methods: {
 		...mapActions('Home', [
@@ -180,19 +174,29 @@ export default {
 		},
 		fieldResult(idx) {
 			return async (results, status)=>{
-				for(let i=0;i<this.$store.state.Home.placesQty; i++) {
+				
+				if(idx===undefined) {
+					if( status==='OK' ) {
+						this.$store.commit('Home/setCurrentPosition', {lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng()})
+					}
+					if(this.currPosition.lat && this.currPosition.lng ) {
+						console.log(this.currPosition.lat)
+						this.getDistance()
+					}
+				}else {
+					for(let i=0;i<this.$store.state.Home.placesQty; i++) {
 					if( status==='OK' && i==idx ) {
 						this.$store.commit('Home/setDestinations',{info: { idx, location:{lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng()}, name: results[0].name, address:results[0].formatted_address},idx:idx})
 					} else if (status!=='OK') {
 						this.$store.commit('Home/setDestinations',{info:{ idx, location:null, name: null, address: null,},idx:idx})
 					}
-					
 				}
-				this.getDistance();
-			};
+				
+			}
+
+				} 
 		},
 		getDistance() {
-			console.log(this.destinations,'destinations',this.currentPosition)
 			function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
 			var R = 6371; // Radius of the earth in km
 			var dLat = deg2rad(lat2-lat1);  // deg2rad below
@@ -204,17 +208,18 @@ export default {
 				; 
 			var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
 			var d = R * c; // Distance in km
-			console.log(d,'d')
 			return d;
-			
 			}
 
 			function deg2rad(deg) {
 			return deg * (Math.PI/180)
 			}
 			this.destinations.forEach(elm=>{
-				getDistanceFromLatLonInKm(elm.location.lat,elm.location.lng,this.currentPosition.lat,this.currentPosition.lng)
+				console.log(elm.location.lat)
+				elm.distance=getDistanceFromLatLonInKm(elm.location.lat,elm.location.lng,this.currentPosition.lat,this.currentPosition.lng)
 			})
+			this.$store.commit('Home/setDestinations',this.destinations)
+			console.log(this.destinations)
 		},
 		
 		//經緯度create Marker
@@ -260,6 +265,9 @@ export default {
 			});
 			
 		},
+	},
+	beforeDestroy() {
+		bus.$off('queryString')
 	},
 };
 </script>

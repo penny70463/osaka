@@ -5,7 +5,7 @@ export const state = {
 	queryString: '',
 	tempQueryString: '',
 	markUrl: '',
-	currentPosition: { lat: 34.4, lng: 135.3 },
+	currentPosition: { lat: '', lng: '' },
 	queryDistance: 500,
 	destinations: [],
 	placesQty:0,
