@@ -40,7 +40,7 @@
 					class="distance"
 				>
 					<template slot="append">
-						meter
+						km
 					</template>
 				</el-input>
 				<el-button @click="queryStringLocations">

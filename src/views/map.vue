@@ -174,16 +174,16 @@ export default {
 		},
 		fieldResult(idx) {
 			return async (results, status)=>{
-				
+				//取得搜尋位置
 				if(idx===undefined) {
 					if( status==='OK' ) {
 						this.$store.commit('Home/setCurrentPosition', {lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng()})
 					}
 					if(this.currPosition.lat && this.currPosition.lng ) {
-						console.log(this.currPosition.lat)
-						this.getDistance()
+						this.getDistance();
 					}
 				}else {
+					//取得景點列表位置
 					for(let i=0;i<this.$store.state.Home.placesQty; i++) {
 					if( status==='OK' && i==idx ) {
 						this.$store.commit('Home/setDestinations',{info: { idx, location:{lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng()}, name: results[0].name, address:results[0].formatted_address},idx:idx})
@@ -214,42 +214,37 @@ export default {
 			function deg2rad(deg) {
 			return deg * (Math.PI/180)
 			}
+			
 			this.destinations.forEach(elm=>{
-				console.log(elm.location.lat)
+				if(elm.distance <= this.queryDistance) {
+					this.marker(elm)
+				}
 				elm.distance=getDistanceFromLatLonInKm(elm.location.lat,elm.location.lng,this.currentPosition.lat,this.currentPosition.lng)
 			})
 			this.$store.commit('Home/setDestinations',this.destinations)
-			console.log(this.destinations)
 		},
-		
-		//經緯度create Marker
-		async currMarker() {
-			let temp = [];
-			//all places
-			Object.values(this.osakaPass).forEach(elm=>{
-				elm.forEach(el=>{
-					temp = temp.concat(el);
-				});
-			});
+		async marker(elm) {
 			//current marker
-			// let marker = new google.maps.Marker({
-          	// 			map: this.map,
-			// 	  		position: new google.maps.LatLng(this.currPosition.lat, this.currPosition.lng),
-			// });
-			// google.maps.event.addListener(marker, 'click', function() {
-			// 	let infowindow = new google.maps.InfoWindow({
-			// 	});
-			// 	infowindow.setContent(`your position`);
-			// 	infowindow.open(this.map, marker);
-			// });
-			// this.resetCenter(this.currPosition.lat, this.currPosition.lng);
+			let marker = new google.maps.Marker({
+          				map: this.map,
+				  		position: new google.maps.LatLng(elm.location.lat, elm.location.lng),
+			});
+			this.markerInfo(marker,elm)
+		},
+
+		//經緯度create Marker
+		async markerInfo(marker,elm) {
+			
+			google.maps.event.addListener(marker, 'click', function() {
+				let infowindow = new google.maps.InfoWindow({
+				});
+				infowindow.setContent(elm.name);
+				infowindow.open(this.map, marker);
+			});
+			 this.resetCenter(this.currPosition.lat, this.currPosition.lng);
 			// let originPosition = new google.maps.LatLng(this.currPosition.lat, this.currPosition.lng);
 			
-			//query for all places
-			await temp.forEach((elm, idx)=>{
-				this.getInfoFromQuery(elm, idx);
-			});
-			await this.getDistance();
+			
 		},
 		async defaultSetting() {
 			//取得各地點資訊
