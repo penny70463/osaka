@@ -180,6 +180,7 @@ export default {
 						this.$store.commit('Home/setCurrentPosition', {lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng()})
 					}
 					if(this.currPosition.lat && this.currPosition.lng ) {
+						
 						this.getDistance();
 					}
 				}else {
@@ -216,10 +217,12 @@ export default {
 			}
 			
 			this.destinations.forEach(elm=>{
+				
+				elm.distance=getDistanceFromLatLonInKm(elm.location.lat,elm.location.lng,this.currentPosition.lat,this.currentPosition.lng)
+				
 				if(elm.distance <= this.queryDistance) {
 					this.marker(elm)
 				}
-				elm.distance=getDistanceFromLatLonInKm(elm.location.lat,elm.location.lng,this.currentPosition.lat,this.currentPosition.lng)
 			})
 			this.$store.commit('Home/setDestinations',this.destinations)
 		},
