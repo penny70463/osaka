@@ -80,21 +80,13 @@ export default {
 		};
 	},
 	watch: {
-		center(val) {
-			this.resetCenter();
-		},
-		// requests() {
-		// 	console.log('watchReq')
-		// 	this.initMap();
-		// 	this.passReq();
-		// },
 		
 	},
 	mounted() {
 		this.initMap();
-		// this.passReq();
 		this.defaultSetting();
 		bus.$on('queryString',event=>{
+			this.initMap();
 			this.getInfoFromQuery(this.queryString,undefined)
 		})
 	},
@@ -123,50 +115,6 @@ export default {
 			this.markers = [];
 		},
 		
-		async getPlaces(req, type) {
-			await this.$store.commit('Home/setMarkUrl', type, { root: true });
-			let service = new google.maps.places.PlacesService(this.map);
-			let map2 = this.map;
-			
-			service.findPlaceFromQuery(req.queryObj, function(results, status) {
-				if(status == 'OK') {
-					let marker = new google.maps.Marker({
-          				map: map2,
-				  		position: results[0].geometry.location,
-				 		 icon: {
-							url: 'http://maps.google.com/mapfiles/kml/pushpin/' + type,
-							size: new google.maps.Size(50, 50),
-							origin: new google.maps.Point(0, 0),
-							anchor: new google.maps.Point(17, 34),
-							scaledSize: new google.maps.Size(50, 50),
-						},
-					});
-
-					google.maps.event.addListener(marker, 'click', function() {
-						let infowindow = new google.maps.InfoWindow({
-						});
-						infowindow.setContent(`${results[0].name} : ${results[0].formatted_address}`);
-						infowindow.open(this.map, marker);
-					});
-				}
-				//若為搜尋結果,resetCenter
-				if(type === 'red-pushpin.png') {
-					map2.panTo(results[0].geometry.location);
-				}
-			});
-		},
-		async passReq() {
-			function test(val) {
-				if(val.type) {
-					return 'red-pushpin.png';
-				} else {
-					return 'wht-pushpin.png';
-				}
-			}
-			for(let req of this.requests) {
-				await this.getPlaces(req, test(req));
-			}
-		},
 		getInfoFromQuery(elm, idx) {
 			let service = new google.maps.places.PlacesService(this.map);
 			service.findPlaceFromQuery({ query: elm,
@@ -193,9 +141,9 @@ export default {
 					}
 				}
 				
-			}
-
+				}
 				} 
+				
 		},
 		getDistance() {
 			function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
@@ -217,20 +165,36 @@ export default {
 			}
 			
 			this.destinations.forEach(elm=>{
-				
 				elm.distance=getDistanceFromLatLonInKm(elm.location.lat,elm.location.lng,this.currentPosition.lat,this.currentPosition.lng)
-				
 				if(elm.distance <= this.queryDistance) {
 					this.marker(elm)
 				}
 			})
-			this.$store.commit('Home/setDestinations',this.destinations)
+			this.marker(this.currPosition)
 		},
 		async marker(elm) {
+			let markerLat,markerLng,markerType
+			if(elm.type) {
+				markerLat=elm.lat;
+				markerLng=elm.lng;
+				markerType='https://image.flaticon.com/icons/svg/1329/1329665.svg'
+			} else {
+				markerLat=elm.location.lat;
+				markerLng=elm.location.lng;
+				markerType='https://image.flaticon.com/icons/svg/684/684908.svg';
+			}
 			//current marker
 			let marker = new google.maps.Marker({
           				map: this.map,
-				  		position: new google.maps.LatLng(elm.location.lat, elm.location.lng),
+						position: new google.maps.LatLng(markerLat, markerLng),
+						icon: {
+						//url: 'http://maps.google.com/mapfiles/kml/pushpin/' + type,
+						url:markerType,
+						size: new google.maps.Size(35, 35),
+						origin: new google.maps.Point(0, 0),
+						anchor: new google.maps.Point(17, 34),
+						scaledSize: new google.maps.Size(35, 35),
+						},
 			});
 			this.markerInfo(marker,elm)
 		},
@@ -244,10 +208,7 @@ export default {
 				infowindow.setContent(elm.name);
 				infowindow.open(this.map, marker);
 			});
-			 this.resetCenter(this.currPosition.lat, this.currPosition.lng);
-			// let originPosition = new google.maps.LatLng(this.currPosition.lat, this.currPosition.lng);
-			
-			
+			 this.resetCenter(this.currPosition.lat, this.currPosition.lng);	
 		},
 		async defaultSetting() {
 			//取得各地點資訊
