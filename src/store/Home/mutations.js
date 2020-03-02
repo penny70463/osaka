@@ -5,10 +5,11 @@ export const state = {
 	queryString: '',
 	tempQueryString: '',
 	markUrl: '',
-	currentPosition: { lat: '', lng: '',type:1 },
+	currentPosition: { lat: '', lng: '',type:1,name: 'your position',address:'' },
 	queryDistance: 2,
 	destinations: [],
 	placesQty:0,
+	filterTemp:[]
 };
 export const mutations = {
 	updateField,
@@ -25,6 +26,7 @@ export const mutations = {
 	setCurrentPosition(state, position) {
 		state.currentPosition.lat = position.lat;
 		state.currentPosition.lng = position.lng;
+		state.currentPosition.address = position.address;
 	},
 	setQueryDistance(state, value) {
 		state.queryDistance = value;

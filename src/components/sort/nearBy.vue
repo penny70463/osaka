@@ -29,6 +29,18 @@
 				v-if="passCategory==4"
 				class="wrap__map__query"
 			>
+				<el-select 
+				v-model="filterTemp"
+				multiple
+				clearable>
+					<el-option 
+					v-for="(item,idx) in buttonContent"
+					:key="idx"
+					:value="idx"
+					:label="item.tooltip">
+						
+					</el-option>
+				</el-select>
 				<el-autocomplete
 					v-model="tempQueryString"
 					placeholder="search locations near by"
@@ -48,7 +60,7 @@
 				</el-button>
 			</div>
 			
-			<mapUnit :requests="convertOsakaPass" />
+			<mapUnit  />
 		</div>
 	</div>
 </template>
@@ -56,8 +68,7 @@
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { mapFields } from 'vuex-map-fields';
 import mapUnit from '../../views/map';
-import { buttonContent } from '../../dummy_data/dataList';
-import { osakaPass } from '../../dummy_data/dataList';
+import { buttonContent, osakaPass } from '../../dummy_data/dataList';
 export default {
 	name: 'NearBy',
 	components: {
@@ -76,11 +87,12 @@ export default {
 			
 		]),
 		...mapGetters('Home', [
-			'convertOsakaPass',
+			
 		]),
 		...mapFields('Home', [
 			'tempQueryString',
 			'queryDistance',
+			'filterTemp',
 		]),
 	},
 	methods: {

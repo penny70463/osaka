@@ -11,7 +11,9 @@
 import { mapActions, mapState, mapGetters, mapMutations } from 'vuex';
 import { mapFields } from 'vuex-map-fields';
 import { osakaPass } from '../dummy_data/dataList';
-import bus from '../assets/scripts/eventBus'
+import bus from '../assets/scripts/eventBus';
+import {MessageBox} from 'element-ui'
+
 export default {
 	props: {
 		center: {
@@ -43,11 +45,7 @@ export default {
 			default: () => [
 			],
 		},
-		requests: {
-			type: Array,
-			default: () => [
-			],
-		},
+		
 	},
 	computed: {
 		...mapState('Home', [
@@ -63,7 +61,7 @@ export default {
 			'setDestinations',
 		]),
 		...mapGetters('Home', [
-			'convertOsakaPass',
+			
 		]),
 		
 		currPosition() {
@@ -121,14 +119,39 @@ export default {
 				fields: ['name', 'geometry', 'formatted_address'] }, this.fieldResult(idx));
 		},
 		fieldResult(idx) {
+			let osakaString=['osaka','大阪', 'Osaka']
+			function checkString(string,address) {
+				if(address && address.includes(string)) {
+					return false
+				} else {
+					return true
+				}
+			}
 			return async (results, status)=>{
+				console.log(results, status)
 				//取得搜尋位置
+				if(status=='OVER_QUERY_LIMIT') {
+					MessageBox.alert('system is busy ! Please try again!','hint',{
+							callback:()=>{
+								
+							}
+						})
+				}
 				if(idx===undefined) {
 					if( status==='OK' ) {
-						this.$store.commit('Home/setCurrentPosition', {lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng()})
+						this.$store.commit('Home/setCurrentPosition', {lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng(), name: results[0].name, address:results[0].formatted_address})
 					}
+					if( osakaString.every( el => checkString(el, this.currPosition.address))) {
+						MessageBox.alert('not in osaka ! PLEASE SEARCH AGAIN!','hint',{
+							callback:()=>{
+								
+								this.initMap()
+								return;
+							}
+						})
+					}
+					
 					if(this.currPosition.lat && this.currPosition.lng ) {
-						
 						this.getDistance();
 					}
 				}else {
@@ -173,6 +196,7 @@ export default {
 			this.marker(this.currPosition)
 		},
 		async marker(elm) {
+			console.log(elm)
 			let markerLat,markerLng,markerType
 			if(elm.type) {
 				markerLat=elm.lat;
@@ -205,7 +229,7 @@ export default {
 			google.maps.event.addListener(marker, 'click', function() {
 				let infowindow = new google.maps.InfoWindow({
 				});
-				infowindow.setContent(elm.name);
+				infowindow.setContent(`<span>${elm.name,elm.address}</span>`);
 				infowindow.open(this.map, marker);
 			});
 			 this.resetCenter(this.currPosition.lat, this.currPosition.lng);	
