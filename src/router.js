@@ -5,6 +5,7 @@ import NearBy from './components/sort/nearBy.vue';
 Vue.use(router);
 
 export default new router({
+	mode: 'history',
 	routes: [
 		{
 			path: '',
