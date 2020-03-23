@@ -9,17 +9,18 @@ const content=await page.evaluate(()=>{
     const facilityRows = document.querySelectorAll('.free_body')
     for(const tr of facilityRows){
         data.push({
-          name: tr.childNodes[1].innerText,
+          id:tr.childNodes[1].innerText.slice(0,2),
+          name: tr.childNodes[1].innerText.slice(2),
           content: tr.childNodes[3].innerText,
          })
 }
 return data
 })
-console.log(content)
+
 const fs = require('fs')
 
 fs.writeFile(
-        './teams.json',
+        './freeFacilities.json',
         JSON.stringify(content),
         ()=>{}
 )
