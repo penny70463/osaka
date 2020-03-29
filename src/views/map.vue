@@ -13,7 +13,7 @@ import { mapFields } from 'vuex-map-fields';
 import { osakaPass } from '../dummy_data/dataList';
 import bus from '../assets/scripts/eventBus';
 import {MessageBox} from 'element-ui'
-
+import  { db } from '../../firestore'
 export default {
 	props: {
 		center: {
@@ -81,13 +81,13 @@ export default {
 		
 	},
 	mounted() {
-		this.test()
+		//this.dbImport()
 		this.initMap();
-		this.defaultSetting();
-		bus.$on('queryString',event=>{
-			this.initMap();
-			this.getInfoFromQuery(this.queryString,undefined)
-		})
+		// this.defaultSetting();
+		// bus.$on('queryString',event=>{
+		// 	this.initMap();
+		// 	this.getInfoFromQuery(this.queryString,undefined)
+		// })
 	},
 	methods: {
 		...mapActions('Home', [
@@ -113,13 +113,14 @@ export default {
 			this.markers.forEach(marker => marker.setMap(null));
 			this.markers = [];
 		},
-		
+		//搜尋更新景點及使用者搜尋字串
 		getInfoFromQuery(elm, idx) {
-			let service = new google.maps.places.PlacesService(this.map);
-			service.findPlaceFromQuery({ query: elm,
-				fields: ['name', 'geometry', 'formatted_address'] }, this.fieldResult(idx));
+			console.log(elm.dm.proto.fields.name.stringValue)
+			 let service = new google.maps.places.PlacesService(this.map);
+			service.findPlaceFromQuery({ query: elm.dm.proto.fields.name.stringValue,
+				fields: ['name', 'geometry', 'formatted_address'] }, this.fieldResult(elm,idx));
 		},
-		fieldResult(idx) {
+		fieldResult(elm,idx) {
 			let osakaString=['osaka','大阪', 'Osaka']
 			function checkString(string,address) {
 				if(address && address.includes(string)) {
@@ -139,6 +140,7 @@ export default {
 						})
 				}
 				if(idx===undefined) {
+					//undefined即現正位置
 					if( status==='OK' ) {
 						this.$store.commit('Home/setCurrentPosition', {lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng(), name: results[0].name, address:results[0].formatted_address})
 					}
@@ -157,14 +159,21 @@ export default {
 					}
 				}else {
 					//取得景點列表位置
-					for(let i=0;i<this.$store.state.Home.placesQty; i++) {
-					if( status==='OK' && i==idx ) {
-						this.$store.commit('Home/setDestinations',{info: { idx, location:{lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng()}, name: results[0].name, address:results[0].formatted_address},idx:idx})
-					} else if (status!=='OK') {
-						this.$store.commit('Home/setDestinations',{info:{ idx, location:null, name: null, address: null,},idx:idx})
-					}
-				}
+					// for(let i=0;i<this.$store.state.Home.placesQty; i++) {
+					// if( status==='OK' && i==idx ) {
+					// 	this.$store.commit('Home/setDestinations',{info: { idx, location:{lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng()}, name: results[0].name, address:results[0].formatted_address},idx:idx})
+					// } else if (status!=='OK') {
+					// 	this.$store.commit('Home/setDestinations',{info:{ idx, location:null, name: null, address: null,},idx:idx})
+					// }
+					// }
 				
+					if(status==='OK') {
+						db.collection("freeFacilities").doc(elm.id).update({
+							info: { 
+								idx, location:{lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng()}, name: results[0].name, address:results[0].formatted_address}
+						})
+					}
+
 				}
 				} 
 				
@@ -249,34 +258,13 @@ export default {
 			});
 			
 		},
-		test() {
-			let firebase = require('firebase/app');
-require('firebase/firestore');
-// Your web app's Firebase configuration
-let firebaseConfig = {
-    apiKey: "AIzaSyCQnB2rjdsIw-sEfWG71c37sy-qoJeLjwc",
-    authDomain: "osaka-map-1573973124960.firebaseapp.com",
-    databaseURL: "https://osaka-map-1573973124960.firebaseio.com",
-    projectId: "osaka-map-1573973124960",
-    storageBucket: "osaka-map-1573973124960.appspot.com",
-    messagingSenderId: "547081207024",
-    appId: "1:547081207024:web:087eaeb54ebeaf3e53d635",
-    measurementId: "G-T1RWX0JBXD"
-  };
-  // Initialize Firebase
-  let app=firebase.initializeApp(firebaseConfig);
-  const db=firebase.firestore();
-
- //json.default.forEach(elm=>{
-	// db.collection("freeFacilities").add({
-	// 	id: elm.id,
-	// 	name: elm.name,
-	// 	content: elm.content,
-	// })
- //})
- db.collection("freeFacilities").get().then((doc)=>{
-   console.log(doc.docs[0].dm.proto.fields.name.stringValue)
- })
+		dbImport() {
+			db.collection("freeFacilities").get().then((doc)=>{
+				this.getInfoFromQuery(doc.docs[0],0)
+				// doc.docs.forEach((elm,i)=> {
+				// 	this.getInfoFromQuery(elm,i)
+				// })
+			})
 		},
 	},
 	beforeDestroy() {

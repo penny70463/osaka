@@ -69,6 +69,7 @@ import { mapActions, mapState, mapGetters } from 'vuex';
 import { mapFields } from 'vuex-map-fields';
 import mapUnit from '../../views/map';
 import { buttonContent, osakaPass } from '../../dummy_data/dataList';
+
 export default {
 	name: 'NearBy',
 	components: {
@@ -80,6 +81,9 @@ export default {
 			buttonContent,
 			osakaPass,
 		};
+	},
+	mounted() {
+		
 	},
 	computed: {
 		...mapState('Home', [
@@ -115,6 +119,8 @@ export default {
 				cb([{ value: 'your location' }].concat(result));
 			}, 3000 * Math.random());
 		},
+		
+		
 	},
 };
 </script>
