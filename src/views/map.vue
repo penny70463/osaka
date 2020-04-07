@@ -16,35 +16,7 @@ import {MessageBox} from 'element-ui'
 import  { db } from '../../firestore'
 export default {
 	props: {
-		center: {
-			type: Object,
-			default: () => ({ lat: 34.669203, lng: 135.503570 }),
-		},
-		zoom: {
-			type: Number,
-			default: 12,
-		},
-		streetViewControl: {
-			type: Boolean,
-			default: true,
-		},
-		mapTypeControl: {
-			type: Boolean,
-			default: true,
-		},
-		fullscreenControl: {
-			type: Boolean,
-			default: true,
-		},
-		zoomControl: {
-			type: Boolean,
-			default: true,
-		},
-		restaurants: {
-			type: Array,
-			default: () => [
-			],
-		},
+		
 		
 	},
 	computed: {
@@ -55,6 +27,7 @@ export default {
 			'currentPosition',
 			'queryDistance',
 			'destinations',
+			'initialMapSetting',
 		]
 		),
 		...mapMutations('Home',[
@@ -81,13 +54,11 @@ export default {
 		
 	},
 	mounted() {
-		//this.dbImport()
 		this.initMap();
-		// this.defaultSetting();
-		// bus.$on('queryString',event=>{
-		// 	this.initMap();
-		// 	this.getInfoFromQuery(this.queryString,undefined)
-		// })
+		bus.$on('queryString',event=>{
+			this.initMap();
+			this.getInfoFromQuery(this.queryString,undefined)
+		})
 	},
 	methods: {
 		...mapActions('Home', [
@@ -95,14 +66,14 @@ export default {
 		]),
 		initMap() {
 			this.map = new google.maps.Map(document.getElementById('map'), {
-				center: this.center,
-				zoom: this.zoom,
+				center: this.initialMapSetting.center.default,
+				zoom: this.initialMapSetting.zoom.default,
 				maxZoom: 20,
 				minZoom: 3,
-				streetViewControl: this.streetViewControl,
-				mapTypeControl: this.mapTypeControl,
-				fullscreenControl: this.fullscreenControl,
-				zoomControl: this.zoomControl,
+				streetViewControl: this.initialMapSetting.streetViewControl.default,
+				mapTypeControl: this.initialMapSetting.mapTypeControl.default,
+				fullscreenControl: this.initialMapSetting.fullscreenControl.default,
+				zoomControl: this.initialMapSetting.zoomControl.default,
 			});
 		},
 		resetCenter(lat, lng) {
@@ -115,9 +86,8 @@ export default {
 		},
 		//搜尋更新景點及使用者搜尋字串
 		getInfoFromQuery(elm, idx) {
-			console.log(elm.dm.proto.fields.name.stringValue)
 			 let service = new google.maps.places.PlacesService(this.map);
-			service.findPlaceFromQuery({ query: elm.dm.proto.fields.name.stringValue,
+			service.findPlaceFromQuery({ query: idx ? elm.dm.proto.fields.name.stringValue :elm,
 				fields: ['name', 'geometry', 'formatted_address'] }, this.fieldResult(elm,idx));
 		},
 		fieldResult(elm,idx) {
@@ -159,16 +129,9 @@ export default {
 					}
 				}else {
 					//取得景點列表位置
-					// for(let i=0;i<this.$store.state.Home.placesQty; i++) {
-					// if( status==='OK' && i==idx ) {
-					// 	this.$store.commit('Home/setDestinations',{info: { idx, location:{lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng()}, name: results[0].name, address:results[0].formatted_address},idx:idx})
-					// } else if (status!=='OK') {
-					// 	this.$store.commit('Home/setDestinations',{info:{ idx, location:null, name: null, address: null,},idx:idx})
-					// }
-					// }
-				
+					
 					if(status==='OK') {
-						db.collection("freeFacilities").doc(elm.id).update({
+						db.collection(`2020-4-6`).doc(elm.id).update({
 							info: { 
 								idx, location:{lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng()}, name: results[0].name, address:results[0].formatted_address}
 						})
@@ -196,25 +159,40 @@ export default {
 			function deg2rad(deg) {
 			return deg * (Math.PI/180)
 			}
-			
-			this.destinations.forEach(elm=>{
-				elm.distance=getDistanceFromLatLonInKm(elm.location.lat,elm.location.lng,this.currentPosition.lat,this.currentPosition.lng)
-				if(elm.distance <= this.queryDistance) {
+			db.collection(`2020-4-6`).get().then((doc)=>{
+				doc.docs.forEach( elm =>{
+				let fields=elm.dm.proto.fields
+				if(fields.info) {
+					let distance=getDistanceFromLatLonInKm(
+					fields.info.mapValue.fields.location.mapValue.fields.lat.doubleValue,
+					fields.info.mapValue.fields.location.mapValue.fields.lng.doubleValue,
+					this.currentPosition.lat,
+					this.currentPosition.lng)
+				if(distance <= this.queryDistance) {
 					this.marker(elm)
 				}
+				}
+				
+				})
 			})
+			// this.destinations.forEach(elm=>{
+			// 	let info=elm.dm.proto.fields.info
+			// 	elm.distance=getDistanceFromLatLonInKm(info.location.lat,info.location.lng,this.currentPosition.lat,this.currentPosition.lng)
+			// 	if(elm.distance <= this.queryDistance) {
+			// 		this.marker(elm)
+			// 	}
+			// })
 			this.marker(this.currPosition)
 		},
 		async marker(elm) {
-			console.log(elm)
 			let markerLat,markerLng,markerType
 			if(elm.type) {
 				markerLat=elm.lat;
 				markerLng=elm.lng;
 				markerType='https://image.flaticon.com/icons/svg/1329/1329665.svg'
 			} else {
-				markerLat=elm.location.lat;
-				markerLng=elm.location.lng;
+				markerLat=elm.dm.proto.fields.info.mapValue.fields.location.mapValue.fields.lat.doubleValue;
+				markerLng=elm.dm.proto.fields.info.mapValue.fields.location.mapValue.fields.lng.doubleValue;
 				markerType='https://image.flaticon.com/icons/svg/684/684908.svg';
 			}
 			//current marker
@@ -231,40 +209,46 @@ export default {
 						},
 			});
 			this.markerInfo(marker,elm)
+			this.$store.commit('Home/setInitialMapSetting',{name:'zoom',data:15})
 		},
 
 		//經緯度create Marker
 		async markerInfo(marker,elm) {
-			
 			google.maps.event.addListener(marker, 'click', function() {
 				let infowindow = new google.maps.InfoWindow({
 				});
-				infowindow.setContent(`<span>${elm.name,elm.address}</span>`);
+				infowindow.setContent(`<span>${elm.dm.proto.fields.name.stringValue}<br>${elm.dm.proto.fields.info.mapValue.fields.address.stringValue}</span>`);
 				infowindow.open(this.map, marker);
 			});
 			 this.resetCenter(this.currPosition.lat, this.currPosition.lng);	
 		},
 		async defaultSetting() {
 			//取得各地點資訊
-			let temp = [];
-			Object.values(this.osakaPass).forEach(elm=>{
-				elm.forEach(el=>{
-					temp = temp.concat(el);
-				});
-			});
-			await this.$store.commit('Home/setPlacesQty',temp.length)
-			await temp.forEach((elm, idx)=>{
-				this.getInfoFromQuery(elm, idx);
-			});
+			// let temp = [];
+			// Object.values(this.osakaPass).forEach(elm=>{
+			// 	elm.forEach(el=>{
+			// 		temp = temp.concat(el);
+			// 	});
+			// });
+			// await this.$store.commit('Home/setPlacesQty',temp.length)
+			// await temp.forEach((elm, idx)=>{
+			// 	this.getInfoFromQuery(elm, idx);
+			// });
 			
 		},
 		dbImport() {
-			db.collection("freeFacilities").get().then((doc)=>{
-				this.getInfoFromQuery(doc.docs[0],0)
-				// doc.docs.forEach((elm,i)=> {
-				// 	this.getInfoFromQuery(elm,i)
-				// })
-			})
+			
+			
+			// db.collection(`2020-4-6`).get().then((doc)=>{
+			// 		doc.docs.forEach((elm,i)=> {
+			// 			//若無info , call map API補齊
+			// 			if(!elm.dm.proto.fields.info) {
+			// 				console.log(elm.dm.proto.fields.info,elm)
+			// 				this.getInfoFromQuery(elm,i)
+			// 			}
+					
+			// 	})
+			// })
 		},
 	},
 	beforeDestroy() {

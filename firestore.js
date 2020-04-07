@@ -12,5 +12,5 @@ let firebaseConfig = {
   };
   let app=firebase.initializeApp(firebaseConfig);
   export const db=firebase.firestore();
-
+  
  

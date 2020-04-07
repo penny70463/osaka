@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 
 (
 async () => {
-const browser = await puppeteer.launch({headless: false});
+const browser = await puppeteer.launch({headless:false});
 const page = await browser.newPage();
 await page.goto('https://www.osp.osaka-info.jp/cht/facility/free');
 
@@ -32,6 +32,16 @@ let firebaseConfig = {
   };
   let app=firebase.initializeApp(firebaseConfig);
   const db=firebase.firestore();
+  
+  content.forEach(elm=>{
+    db.collection(`${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`).add(
+      {
+        id:elm.id,
+        name:elm.name,
+        content:elm.content,
+      },
+    )
+  })
 // const fs = require('fs')
 
 // fs.writeFile(

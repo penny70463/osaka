@@ -9,7 +9,35 @@ export const state = {
 	queryDistance: 2,
 	destinations: [],
 	placesQty:0,
-	filterTemp:[]
+	filterTemp:[],
+	initialMapSetting: {
+		center: {
+			type: Object,
+			default: { lat: 34.669203, lng: 135.503570 },
+		},
+		zoom: {
+			type: Number,
+			default: 12,
+		},
+		streetViewControl: {
+			type: Boolean,
+			default: true,
+		},
+		mapTypeControl: {
+			type: Boolean,
+			default: true,
+		},
+		fullscreenControl: {
+			type: Boolean,
+			default: true,
+		},
+		zoomControl: {
+			type: Boolean,
+			default: true,
+		},
+	},
+	
+	
 };
 export const mutations = {
 	updateField,
@@ -36,5 +64,37 @@ export const mutations = {
 	},
 	setPlacesQty(state,qty) {
 		state.placesQty=qty
+	},
+	setInitialMapSetting(state,{name,data}) {
+		state.initialMapSetting[name].default=data
+	},
+	resetInitialMapSetting(state) {
+		console.log(123)
+		state.initialMapSetting={
+			center: {
+				type: Object,
+				default: { lat: 34.669203, lng: 135.503570 },
+			},
+			zoom: {
+				type: Number,
+				default: 12,
+			},
+			streetViewControl: {
+				type: Boolean,
+				default: true,
+			},
+			mapTypeControl: {
+				type: Boolean,
+				default: true,
+			},
+			fullscreenControl: {
+				type: Boolean,
+				default: true,
+			},
+			zoomControl: {
+				type: Boolean,
+				default: true,
+			},
+		}
 	},
 };

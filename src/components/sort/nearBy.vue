@@ -29,7 +29,7 @@
 				v-if="passCategory==4"
 				class="wrap__map__query"
 			>
-				<el-select 
+				<!-- <el-select 
 				v-model="filterTemp"
 				multiple
 				clearable>
@@ -40,7 +40,7 @@
 					:label="item.tooltip">
 						
 					</el-option>
-				</el-select>
+				</el-select> -->
 				<el-autocomplete
 					v-model="tempQueryString"
 					placeholder="search locations near by"
@@ -58,6 +58,9 @@
 				<el-button @click="queryStringLocations">
 					Go!
 				</el-button>
+				<el-button @click="resetInitialMapSetting()">
+					Reset
+				</el-button>
 			</div>
 			
 			<mapUnit  />
@@ -65,7 +68,7 @@
 	</div>
 </template>
 <script>
-import { mapActions, mapState, mapGetters } from 'vuex';
+import { mapActions, mapState, mapGetters, mapMutations } from 'vuex';
 import { mapFields } from 'vuex-map-fields';
 import mapUnit from '../../views/map';
 import { buttonContent, osakaPass } from '../../dummy_data/dataList';
@@ -103,6 +106,9 @@ export default {
 		...mapActions('Home', [
 			'getAttractionList',
 			'queryStringLocations',
+		]),
+		...mapMutations('Home',[
+			'resetInitialMapSetting',
 		]),
 		//下拉提示選單
 		fetchQuerySuggestion(string, cb) {
