@@ -45,7 +45,7 @@
         flex-direction: column;
         justify-content: center;
         &__query {
-            width:450px;
+            min-width:450px;
             margin: 10px auto;
             display: flex;
             flex-direction: row;
@@ -56,6 +56,18 @@
             .el-input-group {
                 &__append {
                     padding:0 10px;
+                }
+            }
+            .validator {
+                display:flex;
+                width:220px;
+                position: relative;
+                margin-right: 20px;
+                .el-icon-warning{
+                    position: absolute;
+                    right: -18px;
+                    top: 10px;
+                    color:#630303;
                 }
             }
         }

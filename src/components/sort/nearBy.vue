@@ -1,4 +1,5 @@
 <template>
+<ValidationObserver v-slot="{handleSubmit,errors}">
 	<div class="wrap">
 		<h1 class="wrap__title">
 			Osaka Amazing Pass Info
@@ -41,12 +42,28 @@
 						
 					</el-option>
 				</el-select> -->
-				<el-autocomplete
+				<ValidationProvider
+					name="queryString"
+					:rules="{required:true}"
+					tag="div"
+					class="validator"
+					>
+					
+				<el-input
 					v-model="tempQueryString"
 					placeholder="search locations near by"
-					:fetch-suggestions="fetchQuerySuggestion"
 					:clearable="true"
 				/>
+				<el-tooltip content="required">
+					<i class="el-icon-warning" v-show="errors.queryString && errors.queryString.length"></i>
+				</el-tooltip>
+				</ValidationProvider>
+				<ValidationProvider
+					name="distance"
+					:rules="{required:true}"
+					tag="div"
+					class="validator"
+					>
 				<el-input  
 					v-model="queryDistance"
 					class="distance"
@@ -55,10 +72,14 @@
 						km
 					</template>
 				</el-input>
-				<el-button @click="queryStringLocations">
+				<el-tooltip content="required">
+					<i class="el-icon-warning" v-show="errors.distance && errors.distance.length"></i>
+				</el-tooltip>
+				</ValidationProvider>
+				<el-button @click="handleSubmit(queryStringLocations)">
 					Go!
 				</el-button>
-				<el-button @click="resetInitialMapSetting()">
+				<el-button @click="setQueryString('');initMap()">
 					Reset
 				</el-button>
 			</div>
@@ -66,17 +87,23 @@
 			<mapUnit  />
 		</div>
 	</div>
+	</ValidationObserver>
 </template>
 <script>
 import { mapActions, mapState, mapGetters, mapMutations } from 'vuex';
 import { mapFields } from 'vuex-map-fields';
 import mapUnit from '../../views/map';
 import { buttonContent, osakaPass } from '../../dummy_data/dataList';
+import { ValidationProvider,ValidationObserver, extend } from 'vee-validate';
+import { required } from 'vee-validate/dist/rules';
+extend('required', required);
 
 export default {
 	name: 'NearBy',
 	components: {
 		mapUnit,
+		ValidationProvider,
+		ValidationObserver,
 	},
 	data() {
 		return {
@@ -106,9 +133,10 @@ export default {
 		...mapActions('Home', [
 			'getAttractionList',
 			'queryStringLocations',
+			'initMap',
 		]),
 		...mapMutations('Home',[
-			'resetInitialMapSetting',
+			'setQueryString',
 		]),
 		//下拉提示選單
 		fetchQuerySuggestion(string, cb) {

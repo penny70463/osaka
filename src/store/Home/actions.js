@@ -6,8 +6,8 @@ export default {
 	},
 	async queryStringLocations({ commit, state }) {
 		let { tempQueryString } = state;
-		commit('setCurrentPosition', { lat:'', lng:''});
-		commit('setQueryString', '');
+		// commit('setCurrentPosition', { lat:'', lng:''});
+		// commit('setQueryString', '');
 		if(tempQueryString === 'your location') {
 			if(navigator.geolocation) {
 				  // 跟使用者拿所在位置的權限
@@ -23,5 +23,16 @@ export default {
 			
 		}
 	},
-	
+	initMap({state}) {
+		state.map = new google.maps.Map(document.getElementById('map'), {
+			center: state.initialMapSetting.center.default,
+			zoom: state.initialMapSetting.zoom.default,
+			maxZoom: 20,
+			minZoom: 3,
+			streetViewControl: state.initialMapSetting.streetViewControl.default,
+			mapTypeControl: state.initialMapSetting.mapTypeControl.default,
+			fullscreenControl: state.initialMapSetting.fullscreenControl.default,
+			zoomControl: state.initialMapSetting.zoomControl.default,
+		});
+	},
 };

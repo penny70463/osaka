@@ -28,6 +28,7 @@ export default {
 			'queryDistance',
 			'destinations',
 			'initialMapSetting',
+			'map',
 		]
 		),
 		...mapMutations('Home',[
@@ -43,7 +44,7 @@ export default {
 	},
 	data() {
 		return {
-			map: null,
+			// map: null,
 			infowindow: null,
 			markers: [],
 			locations: [],
@@ -62,20 +63,20 @@ export default {
 	},
 	methods: {
 		...mapActions('Home', [
-			
+			'initMap',
 		]),
-		initMap() {
-			this.map = new google.maps.Map(document.getElementById('map'), {
-				center: this.initialMapSetting.center.default,
-				zoom: this.initialMapSetting.zoom.default,
-				maxZoom: 20,
-				minZoom: 3,
-				streetViewControl: this.initialMapSetting.streetViewControl.default,
-				mapTypeControl: this.initialMapSetting.mapTypeControl.default,
-				fullscreenControl: this.initialMapSetting.fullscreenControl.default,
-				zoomControl: this.initialMapSetting.zoomControl.default,
-			});
-		},
+		// initMap() {
+		// 	this.map = new google.maps.Map(document.getElementById('map'), {
+		// 		center: this.initialMapSetting.center.default,
+		// 		zoom: this.initialMapSetting.zoom.default,
+		// 		maxZoom: 20,
+		// 		minZoom: 3,
+		// 		streetViewControl: this.initialMapSetting.streetViewControl.default,
+		// 		mapTypeControl: this.initialMapSetting.mapTypeControl.default,
+		// 		fullscreenControl: this.initialMapSetting.fullscreenControl.default,
+		// 		zoomControl: this.initialMapSetting.zoomControl.default,
+		// 	});
+		// },
 		resetCenter(lat, lng) {
 			// set center
 			this.map.panTo({ lat: lat || this.center.lat, lng: lng || this.center.lng });
@@ -114,10 +115,17 @@ export default {
 					if( status==='OK' ) {
 						this.$store.commit('Home/setCurrentPosition', {lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng(), name: results[0].name, address:results[0].formatted_address})
 					}
+					if(status==='ZERO_RESULTS') {
+						MessageBox.alert("Can't find this place, please try again!",'hint',{
+							callback:()=>{
+								this.initMap()
+								return;
+							}
+						})
+					}
 					if( osakaString.every( el => checkString(el, this.currPosition.address))) {
 						MessageBox.alert('not in osaka ! PLEASE SEARCH AGAIN!','hint',{
 							callback:()=>{
-								
 								this.initMap()
 								return;
 							}
