@@ -1,6 +1,5 @@
 <template>
 	<div>
-		<h2>map here</h2>
 		<div
 			id="map"
 			class="google-map"
@@ -55,9 +54,9 @@ export default {
 		
 	},
 	mounted() {
-		this.initMap();
+		this.initMap(12);
 		bus.$on('queryString',event=>{
-			this.initMap();
+			this.initMap(14);
 			this.getInfoFromQuery(this.queryString,undefined)
 		})
 	},
@@ -65,18 +64,7 @@ export default {
 		...mapActions('Home', [
 			'initMap',
 		]),
-		// initMap() {
-		// 	this.map = new google.maps.Map(document.getElementById('map'), {
-		// 		center: this.initialMapSetting.center.default,
-		// 		zoom: this.initialMapSetting.zoom.default,
-		// 		maxZoom: 20,
-		// 		minZoom: 3,
-		// 		streetViewControl: this.initialMapSetting.streetViewControl.default,
-		// 		mapTypeControl: this.initialMapSetting.mapTypeControl.default,
-		// 		fullscreenControl: this.initialMapSetting.fullscreenControl.default,
-		// 		zoomControl: this.initialMapSetting.zoomControl.default,
-		// 	});
-		// },
+	
 		resetCenter(lat, lng) {
 			// set center
 			this.map.panTo({ lat: lat || this.center.lat, lng: lng || this.center.lng });
@@ -101,10 +89,9 @@ export default {
 				}
 			}
 			return async (results, status)=>{
-				console.log(results, status)
 				//取得搜尋位置
 				if(status=='OVER_QUERY_LIMIT') {
-					MessageBox.alert('system is busy ! Please try again!','hint',{
+					MessageBox.alert('System is busy ! Please try again!','hint',{
 							callback:()=>{
 								
 							}
@@ -113,20 +100,25 @@ export default {
 				if(idx===undefined) {
 					//undefined即現正位置
 					if( status==='OK' ) {
-						this.$store.commit('Home/setCurrentPosition', {lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng(), name: results[0].name, address:results[0].formatted_address})
+						this.$store.commit('Home/setCurrentPosition', 
+						{
+							lat:results[0].geometry.location.lat(), 
+							lng:results[0].geometry.location.lng(), 
+							name: results[0].name, 
+							address:results[0].formatted_address,})
 					}
 					if(status==='ZERO_RESULTS') {
 						MessageBox.alert("Can't find this place, please try again!",'hint',{
 							callback:()=>{
-								this.initMap()
+								this.initMap(12)
 								return;
 							}
 						})
 					}
 					if( osakaString.every( el => checkString(el, this.currPosition.address))) {
-						MessageBox.alert('not in osaka ! PLEASE SEARCH AGAIN!','hint',{
+						MessageBox.alert('This location is not in osaka ! Please search again!','hint',{
 							callback:()=>{
-								this.initMap()
+								this.initMap(12)
 								return;
 							}
 						})
@@ -217,7 +209,7 @@ export default {
 						},
 			});
 			this.markerInfo(marker,elm)
-			this.$store.commit('Home/setInitialMapSetting',{name:'zoom',data:15})
+			
 		},
 
 		//經緯度create Marker
@@ -225,25 +217,19 @@ export default {
 			google.maps.event.addListener(marker, 'click', function() {
 				let infowindow = new google.maps.InfoWindow({
 				});
-				infowindow.setContent(`<span>${elm.dm.proto.fields.name.stringValue}<br>${elm.dm.proto.fields.info.mapValue.fields.address.stringValue}</span>`);
+				
+				infowindow.setContent(
+					elm.name ? `<div class="location-name">${elm.name}</div>`:
+					`<div class="location-name">${elm.dm.proto.fields.name.stringValue}</div>
+					<hr>
+					<span class="location-address">${elm.dm.proto.fields.info.mapValue.fields.address.stringValue}</span>
+					<br>
+					<span>${JSON.parse(JSON.stringify(elm.dm.proto.fields.content)).stringValue}</span>`);
 				infowindow.open(this.map, marker);
 			});
 			 this.resetCenter(this.currPosition.lat, this.currPosition.lng);	
 		},
-		async defaultSetting() {
-			//取得各地點資訊
-			// let temp = [];
-			// Object.values(this.osakaPass).forEach(elm=>{
-			// 	elm.forEach(el=>{
-			// 		temp = temp.concat(el);
-			// 	});
-			// });
-			// await this.$store.commit('Home/setPlacesQty',temp.length)
-			// await temp.forEach((elm, idx)=>{
-			// 	this.getInfoFromQuery(elm, idx);
-			// });
-			
-		},
+		
 		dbImport() {
 			
 			

@@ -1,11 +1,11 @@
 <template>
-<ValidationObserver v-slot="{handleSubmit,errors}">
+<ValidationObserver v-slot="{handleSubmit,errors,reset}">
 	<div class="wrap">
 		<h1 class="wrap__title">
-			Osaka Amazing Pass Info
+			Osaka Amazing Pass Free Facilites Information
 		</h1>
 		
-		<div class="wrap__buttons">
+		<!-- <div class="wrap__buttons">
 			<el-tooltip 
 				v-for="(btn,idx) in buttons"
 				:key="idx"
@@ -24,10 +24,9 @@
 					>
 				</el-button>
 			</el-tooltip>
-		</div>
+		</div> -->
 		<div class="wrap__map">
 			<div
-				v-if="passCategory==4"
 				class="wrap__map__query"
 			>
 				<!-- <el-select 
@@ -48,7 +47,14 @@
 					tag="div"
 					class="validator"
 					>
-					
+					<div class="wrap__buttons">
+						<el-button>
+					<img
+						src="https://i.ibb.co/vqKQX8W/5.png"
+						class="wrap__buttons__icon"
+					>
+					</el-button>
+					</div>
 				<el-input
 					v-model="tempQueryString"
 					placeholder="search locations near by"
@@ -60,31 +66,52 @@
 				</ValidationProvider>
 				<ValidationProvider
 					name="distance"
-					:rules="{required:true}"
+					:rules="{required:true,numeric:true}"
 					tag="div"
 					class="validator"
 					>
+					<div class="wrap__buttons">
+						<el-button
+					
+				>
+					<img
+						src="https://i.ibb.co/FwgGpzq/image-1.png"
+						class="wrap__buttons__icon"
+					>
+					</el-button>
+					</div>
 				<el-input  
-					v-model="queryDistance"
+					v-model.number="queryDistance"
 					class="distance"
+					placeholder="distance"
 				>
 					<template slot="append">
 						km
 					</template>
 				</el-input>
-				<el-tooltip content="required">
+				<el-tooltip content="required and must be a number">
 					<i class="el-icon-warning" v-show="errors.distance && errors.distance.length"></i>
 				</el-tooltip>
 				</ValidationProvider>
-				<el-button @click="handleSubmit(queryStringLocations)">
+				<div class="button-wrap">
+				<el-button 
+					@click="handleSubmit(queryStringLocations)"
+					class="box-shadow--blue">
 					Go!
 				</el-button>
-				<el-button @click="setQueryString('');initMap()">
+				<el-button 
+					@click="setQueryString({type:0});reset();initMap(12)"
+					class="box-shadow--red">
 					Reset
 				</el-button>
+				</div>
 			</div>
-			
+			<div class="info-area">
+				<div class="info-area__tip"><img src="https://image.flaticon.com/icons/svg/1329/1329665.svg"/><p>The location you've searched</p></div>
+				<div class="info-area__tip"><img src="https://image.flaticon.com/icons/svg/684/684908.svg"/><p>The free facilites around your target</p></div>
+			</div>
 			<mapUnit  />
+			
 		</div>
 	</div>
 	</ValidationObserver>
@@ -95,9 +122,9 @@ import { mapFields } from 'vuex-map-fields';
 import mapUnit from '../../views/map';
 import { buttonContent, osakaPass } from '../../dummy_data/dataList';
 import { ValidationProvider,ValidationObserver, extend } from 'vee-validate';
-import { required } from 'vee-validate/dist/rules';
+import { required,numeric } from 'vee-validate/dist/rules';
 extend('required', required);
-
+extend('numeric', numeric);
 export default {
 	name: 'NearBy',
 	components: {

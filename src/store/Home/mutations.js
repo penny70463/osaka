@@ -46,8 +46,16 @@ export const mutations = {
 	setPassCategory(state, category) {
 		state.passCategory = category;
 	},
-	setQueryString(state, string) {
-		state.queryString = string;
+	setQueryString(state, {type, string}) {
+		//type 0=>reset, type 1=>update
+		if(type) {
+			state.queryString = string;
+		} else {
+			state.tempQueryString='';
+			state.queryString='';
+			state.queryDistance=''
+		}
+		
 	},
 	setMarkUrl(state, url) {
 		state.markUrl = url;

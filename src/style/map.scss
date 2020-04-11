@@ -9,21 +9,10 @@
     }
     &__buttons {
         margin:0 auto;
-        display:flex;
-        justify-content: center;
-        width:100%;
-        .el-button {
-            background-color:$minority-bk-color;
-            color:$text-color;
-            border:none;
-            border-radius:10px;
-            position: relative;
-            height:60px;
-            width:60px;
-        }
+        
         &__icon {
-            height:50px;
-            width:50px;
+            height:40px;
+            width:40px;
             z-index:9999;
             position: absolute;
             left: 5px;
@@ -48,11 +37,10 @@
             min-width:450px;
             margin: 10px auto;
             display: flex;
-            flex-direction: row;
-            justify-content:space-between;
-            .distance {
-                width:150px;
-            }
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: 160px;
             .el-input-group {
                 &__append {
                     padding:0 10px;
@@ -60,20 +48,94 @@
             }
             .validator {
                 display:flex;
-                width:220px;
+                align-items: center;
+                width:255px;
                 position: relative;
                 margin-right: 20px;
                 .el-icon-warning{
                     position: absolute;
-                    right: -18px;
-                    top: 10px;
+                    right: -25px;
+                    top: 15px;
                     color:#630303;
+                }
+                .el-input {
+                    &__inner {
+                        height:50px;
+                        border-radius: 0 5px 5px 0;
+                    }
+                }
+                .el-button {
+                    background-color:$minority-bk-color;
+                    color:$text-color;
+                    border:none;
+                    border-radius: 5px 0 0 5px;
+                    position: relative;
+                    height:50px;
+                    width:50px;
+                }
+                .distance {
+                    .el-input {
+                        &__inner {
+                            border-radius: 0 ;
+                        }
+                    }
                 }
             }
         }
     }
 }
-
+.button-wrap {
+    .el-button {
+        width:85px;
+        color:#000000ab;;
+    }
+    .box-shadow {
+        border: 1px solid #ffffffb5;
+        color:white;
+        &--blue {
+            background: linear-gradient(to bottom, #18a8ec, #23a8bdbf);
+            &:hover {
+                background: #fff;
+                color:#23a8bdbf;
+            }
+        }
+        &--red {
+            background: linear-gradient(to bottom, #e75174, #c44479bf);
+            &:hover {
+                background: #fff;
+                color:#c44479bf;
+            }
+        }
+    }
+}
+.info-area {
+    display:flex;
+    flex-direction: column;
+    &__tip {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        img {
+            width: 40px;
+            height:40px;
+            margin-right: 10px;
+        }
+    }
+}
+//google map info dialog
 .gm-style-iw-d {
     color:black;
+    max-width: none;
+    max-height: none;
+}
+.gm-style-iw-c {
+    padding:10px;
+    border-radius: 4px;
+}
+.gm-ui-hover-effect {
+    top: -3px!important;
+    right: -3px!important;
+}
+.location-name {
+    font-weight: 500;
 }

@@ -61,4 +61,7 @@ export const buttonContent = {
 		iconLink: 'https://i.ibb.co/vqKQX8W/5.png',
 		iconLink2: 'https://i.ibb.co/c1tsBz9/5.png',
 	},
+	'5': {
+		iconLink:'https://i.ibb.co/FwgGpzq/image-1.png',
+	},
 };
