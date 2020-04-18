@@ -1,10 +1,10 @@
 const puppeteer = require('puppeteer');
-
+const lang='en';
 (
 async () => {
 const browser = await puppeteer.launch({headless:false});
 const page = await browser.newPage();
-await page.goto('https://www.osp.osaka-info.jp/cht/facility/free');
+await page.goto(`https://www.osp.osaka-info.jp/${lang}/facility/free`);
 
 const content=await page.evaluate(()=>{
     const data=[]
@@ -32,16 +32,23 @@ let firebaseConfig = {
   };
   let app=firebase.initializeApp(firebaseConfig);
   const db=firebase.firestore();
-  
-  content.forEach(elm=>{
-    db.collection(`${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`).add(
-      {
-        id:elm.id,
-        name:elm.name,
-        content:elm.content,
-      },
-    )
+
+  db.collection('2020-4-6').get().then((doc)=>{
+    doc.docs.forEach((elm)=>{
+      content.forEach(el=>{
+        if(elm._document.proto.fields.id.stringValue==el.id) {
+          return db.collection('2020-4-6').doc(elm.id).update({
+            enContent:el.content,
+            enName:el.name,
+          })
+          
+        }
+      })
+      
+    })
   })
+  
+  //生成json
 // const fs = require('fs')
 
 // fs.writeFile(
