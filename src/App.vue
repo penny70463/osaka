@@ -1,18 +1,18 @@
 <template>
 	<div id="app">
-		<NearBy />
+		<Wrap />
 	</div>
 </template>
 
 <script>
-import NearBy from './components/sort/nearBy';
+import Wrap from './views/wrap';
 import { routes } from './router';
 
 
 export default {
 	name: 'App',
 	components: {
-		NearBy,
+		Wrap,
 	},
 	data() {
 		return {

@@ -1,9 +1,7 @@
 import bus from '../../assets/scripts/eventBus'
 
 export default {
-	getAttractionList({ commit }, val) {
-		commit('setPassCategory', val);
-	},
+	
 	async queryStringLocations({ commit, state }) {
 		let { tempQueryString } = state;
 		

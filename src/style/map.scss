@@ -2,8 +2,30 @@
 
 .wrap{
     display:flex;
+    position: relative;
     flex-direction: column;
     justify-content: center;
+    .lang{
+        position: absolute;
+        top:0;
+        right:0;
+        width:135px;
+        .el-button-group {
+            display: flex;
+               button {
+                   //width:100%;
+                   span {
+                       display: flex;
+                       align-items: center;
+                       img {
+                        width:24px;
+                        height:24px;
+                        margin-right: 5px;
+                    }
+                   }
+               }
+           }
+    }
     &__title{
         text-align: center;
     }
@@ -18,7 +40,7 @@
             left: 5px;
             top:5px;
             &:hover {
-               opacity: 0;
+               cursor: default;;
             }
         }
         &__icon2 {
@@ -84,6 +106,29 @@
         }
     }
 }
+
+.el-dropdown {
+    &-menu {
+        width:135px;
+        &__item {
+            //width:135px;
+            .flag {
+                display: flex;
+                align-items: center;
+                img {
+                    width:24px;
+                    height:24px;
+                    margin-right: 5px;
+                }
+            }
+        }
+    }
+    &__caret-button {
+        width:30px;
+    }
+   
+}
+
 .button-wrap {
     .el-button {
         width:85px;

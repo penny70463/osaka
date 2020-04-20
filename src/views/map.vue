@@ -28,6 +28,7 @@ export default {
 			'destinations',
 			'initialMapSetting',
 			'map',
+			'lang',
 		]
 		),
 		...mapMutations('Home',[
@@ -214,25 +215,26 @@ export default {
 
 		//經緯度create Marker
 		async markerInfo(marker,elm) {
+			let language=this.lang
 			google.maps.event.addListener(marker, 'click', function() {
 				let infowindow = new google.maps.InfoWindow({
 				});
-				
-				infowindow.setContent(
-					elm.name ? `<div class="location-name">${elm.name}</div>`:
-					`<div class="location-name">${elm.dm.proto.fields.name.stringValue}</div>
-					<hr>
-					<span class="location-address">${elm.dm.proto.fields.info.mapValue.fields.address.stringValue}</span>
-					<br>
-					<span>${JSON.parse(JSON.stringify(elm.dm.proto.fields.content)).stringValue}</span>`);
-				infowindow.open(this.map, marker);
+			let langName = language == 'tc' ? 'name' : `${language}Name`	
+			let langContent = language == 'tc' ? 'content' : `${language}Content`
+			infowindow.setContent(
+				elm.name ? `<div class="location-name">${elm.name}</div>`:
+				`<div class="location-name">${elm.dm.proto.fields[langName].stringValue}</div>
+				<hr>
+				<span class="location-address">${elm.dm.proto.fields.info.mapValue.fields.address.stringValue}</span>
+				<br>
+				<span>${JSON.parse(JSON.stringify(elm.dm.proto.fields[langContent])).stringValue}</span>`
+				);
+			infowindow.open(this.map, marker);
 			});
 			 this.resetCenter(this.currPosition.lat, this.currPosition.lng);	
 		},
 		
 		dbImport() {
-			
-			
 			// db.collection(`2020-4-6`).get().then((doc)=>{
 			// 		doc.docs.forEach((elm,i)=> {
 			// 			//若無info , call map API補齊

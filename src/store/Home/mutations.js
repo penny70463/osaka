@@ -1,6 +1,7 @@
 import { updateField } from 'vuex-map-fields';
 
 export const state = {
+	lang:'tc',
 	passCategory: '4',
 	queryString: '',
 	tempQueryString: '',
@@ -37,12 +38,14 @@ export const state = {
 			default: true,
 		},
 	},
-	
+	mapLoading:false,
 	
 };
 export const mutations = {
 	updateField,
-	
+	setLang(state,lang) {
+		state.lang=lang
+	},
 	setPassCategory(state, category) {
 		state.passCategory = category;
 	},
@@ -77,5 +80,7 @@ export const mutations = {
 	setInitialMapSetting(state,{name,data}) {
 		state.initialMapSetting[name].default=data
 	},
-	
-};
+	setMapLoading(state, bool) {
+		state.mapLoading=bool
+	},
+}
