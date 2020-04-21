@@ -58,7 +58,13 @@ export default {
 		this.initMap(12);
 		bus.$on('queryString',event=>{
 			this.initMap(14);
-			this.getInfoFromQuery(this.queryString,undefined)
+			//eventType 是否為查詢字串
+			if(event.eventType) {
+				this.getInfoFromQuery(this.queryString,undefined)
+			} else {
+				this.getDistance();
+			}
+			
 		})
 	},
 	methods: {
@@ -66,9 +72,12 @@ export default {
 			'initMap',
 		]),
 	
-		resetCenter(lat, lng) {
-			// set center
-			this.map.panTo({ lat: lat || this.center.lat, lng: lng || this.center.lng });
+		resetCenter() {
+				this.map.setOptions({ 
+				center: {
+					lat: this.initialMapSetting.center.default.lat, 
+					lng: this.initialMapSetting.center.default.lng
+					}});
 		},
 		clearMarkers() {
 			this.markers.forEach(marker => marker.setMap(null));
@@ -130,7 +139,6 @@ export default {
 					}
 				}else {
 					//取得景點列表位置
-					
 					if(status==='OK') {
 						db.collection(`2020-4-6`).doc(elm.id).update({
 							info: { 
@@ -173,16 +181,8 @@ export default {
 					this.marker(elm)
 				}
 				}
-				
 				})
 			})
-			// this.destinations.forEach(elm=>{
-			// 	let info=elm.dm.proto.fields.info
-			// 	elm.distance=getDistanceFromLatLonInKm(info.location.lat,info.location.lng,this.currentPosition.lat,this.currentPosition.lng)
-			// 	if(elm.distance <= this.queryDistance) {
-			// 		this.marker(elm)
-			// 	}
-			// })
 			this.marker(this.currPosition)
 		},
 		async marker(elm) {
@@ -231,7 +231,8 @@ export default {
 				);
 			infowindow.open(this.map, marker);
 			});
-			 this.resetCenter(this.currPosition.lat, this.currPosition.lng);	
+			this.$store.commit('Home/setInitialMapSetting', {name:'center',data:{ lat:this.currPosition.lat, lng:this.currPosition.lng}})
+			 this.resetCenter();	
 		},
 		
 		dbImport() {
