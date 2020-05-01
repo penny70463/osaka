@@ -1,5 +1,9 @@
 <template>
-	<div>
+	<div
+		v-loading="loading"
+		element-loading-text="loading"
+		element-loading-spinner="el-icon-loading"
+		element-loading-background="rgba(0, 0, 0, 0.8)">
 		<div
 			id="map"
 			class="google-map"
@@ -29,6 +33,10 @@ export default {
 			'initialMapSetting',
 			'map',
 			'lang',
+		]
+		),
+		...mapState( [
+			'loading',
 		]
 		),
 		...mapMutations('Home',[
@@ -233,6 +241,7 @@ export default {
 			});
 			this.$store.commit('Home/setInitialMapSetting', {name:'center',data:{ lat:this.currPosition.lat, lng:this.currPosition.lng}})
 			 this.resetCenter();	
+			 this.$store.commit('setLoading',false)
 		},
 		
 		dbImport() {

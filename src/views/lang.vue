@@ -5,8 +5,8 @@
         @command="setLang"
         size="small"
       >
-        <img :src="imgUrl(lang)">
-        <span>{{langLabel(lang)}}</span>
+        <!-- <img :src="imgUrl(lang)"> -->
+        <span class="nation">{{langLabel(lang)}}</span>
      <el-dropdown-menu>
          <el-dropdown-item
             v-for="(item,i) in langList"
@@ -18,8 +18,8 @@
             <div 
                 class="flag"
                 v-if="lang!==item.name">
-                <img :src="imgUrl(item.name)">
-                <span>{{item.label}}</span>
+                <!-- <img :src="imgUrl(item.name)"> -->
+                <span class="nation">{{item.label}}</span>
             </div>
          </el-dropdown-item>
      </el-dropdown-menu>

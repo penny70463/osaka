@@ -17,11 +17,22 @@
 					>
 					</el-button>
 					</div>
-				<el-input
+					 <el-autocomplete
+					 	class="string"
+						:class="{'err':errors.queryString && errors.queryString.length}"
+						v-model="tempQueryString"
+						:fetch-suggestions="querySearch"
+						placeholder="search locations near by"
+						:clearable="true"
+						@select="setQueryString({type:1,string:tempQueryString})"
+						>
+						</el-autocomplete>
+				<!-- <el-input
 					v-model="tempQueryString"
 					placeholder="search locations near by"
 					:clearable="true"
-				/>
+					:class="{'err':errors.queryString && errors.queryString.length}"
+				/> -->
 				<el-tooltip content="required">
 					<i class="el-icon-warning" v-show="errors.queryString && errors.queryString.length"></i>
 				</el-tooltip>
@@ -46,6 +57,7 @@
 					v-model.number="queryDistance"
 					class="distance"
 					placeholder="distance"
+					:class="{'err':errors.distance && errors.distance.length}"
 				>
 					<template slot="append">
 						km
@@ -79,6 +91,11 @@ extend('required', required);
 extend('numeric', numeric);
 
 export default {
+	data() {
+		return {
+			
+		}
+	},
     components: {
 		ValidationProvider,
 		ValidationObserver,
@@ -97,7 +114,10 @@ export default {
     ...mapMutations('Home',[
         'setQueryString',
     ]),
-    
+    querySearch(queryString, cb) {
+        // 调用 callback 返回建议列表的数据
+        cb([{'value':'your location'}]);
+      },
 },
 }
 </script>

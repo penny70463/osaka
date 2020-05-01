@@ -1,8 +1,9 @@
 import bus from '../../assets/scripts/eventBus'
-
+import { MessageBox } from 'element-ui'
 export default {
 	
 	async queryStringLocations({ commit, state}) {
+		commit('setLoading',true, {root:true})
 		let { tempQueryString } = state;
 		let eventType = tempQueryString === 'your location' ? 0 : 1
 		if(tempQueryString === 'your location') {
@@ -13,11 +14,19 @@ export default {
 							await commit('setCurrentPosition', { lat: position.coords.latitude, lng: position.coords.longitude }); 
 							bus.$emit('queryString',{ eventType:eventType, });
 						}, function() {
-						alert('sorry, positioning failed');
+						MessageBox.alert('sorry, positioning failed','hint',{
+							callback:()=>{
+								commit('setLoading',false, {root:true})
+							}
+						});
 					  });
 				
 			} else {
-				alert('sorry, your device doesn\'t support for positioning');
+				MessageBox.alert('sorry, your device doesn\'t support for positioning','hint',{
+					callback:()=>{
+						commit('setLoading',false, {root:true})
+					}
+				});
 			}
 		} else {
 			await commit('setQueryString', {type:1,string:tempQueryString});

@@ -1,14 +1,14 @@
 <template>
 	<div class="wrap">
-		<lang />
 		<h1 class="wrap__title">
-			Osaka Amazing Pass Free Facilites Information
+			Osaka Amazing Pass Free Facilites Information Map
 		</h1>
 		<div class="wrap__map">
 			<query />
 			<div class="info-area">
 				<div class="info-area__tip"><img src="https://image.flaticon.com/icons/svg/1329/1329665.svg"/><p>The location you've searched</p></div>
 				<div class="info-area__tip"><img src="https://image.flaticon.com/icons/svg/684/684908.svg"/><p>The free facilites around your target</p></div>
+				<div class="info-area__tip"><lang /></div>
 			</div>
 			<mapUnit  />
 		</div>
