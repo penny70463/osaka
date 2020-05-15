@@ -18,7 +18,6 @@
 					</el-button>
 					</div>
 					 <el-autocomplete
-					 	class="string"
 						:class="{'err':errors.queryString && errors.queryString.length}"
 						v-model="tempQueryString"
 						:fetch-suggestions="querySearch"
