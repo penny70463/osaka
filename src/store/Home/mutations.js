@@ -39,7 +39,13 @@ export const state = {
 		},
 	},
 	mapLoading:false,
-	
+	registerDialog: {
+		visible:false,
+		register:0 },
+	userInfo: {
+		email:'',
+		password:'',
+	}
 };
 export const mutations = {
 	updateField,
@@ -83,4 +89,12 @@ export const mutations = {
 	setMapLoading(state, bool) {
 		state.mapLoading=bool
 	},
+	setRegisterDialog(state, {visible,register}) {
+		//register: 0 log in, 1 register
+		state.registerDialog.register = register
+		state.registerDialog.visible = visible
+	},
+	setUserInfo(state, info) {
+		state.userInfo = info
+	}
 }

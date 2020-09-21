@@ -1,8 +1,27 @@
 <template>
 	<div class="wrap">
-		<h1 class="wrap__title">
+		<div class="wrap__title">
+			<div class="wrap__title--btns">
+			<el-button 
+			@click="setRegisterDialog({visible:true,register:0})"
+			class="bg-transparent">
+				Log In
+			</el-button>
+			<el-button
+			@click="setRegisterDialog({visible:true,register:1})"
+			>
+				Register
+			</el-button>
+			</div>
+			<!-- <div class="wrap__title--btns">
+			<el-button>
+				Log Out
+			</el-button>
+			</div> -->
+		<h1>
 			Osaka Amazing Pass Free Facilites Information Map
 		</h1>
+		</div>
 		<div class="wrap__map">
 			<query />
 			<div class="info-area">
@@ -12,19 +31,18 @@
 			</div>
 			<mapUnit  />
 		</div>
+		<registerDialog />
 	</div>
 </template>
 <script>
-
-import mapUnit from './map';
-import query from'./query';
-import lang from './lang';
+import { mapMutations} from 'vuex'
 export default {
 	name: 'NearBy',
 	components: {
-		mapUnit,
-		query,
-		lang,
+		mapUnit:()=>import('../components/map'),
+		query:()=>import('../components/query'),
+		lang:()=>import('../components/lang'),
+		registerDialog:()=>import('../components/registerLoginDialog'),
 	},
 	data() {
 		return {
@@ -38,7 +56,9 @@ export default {
 		
 	},
 	methods: {
-	
+	...mapMutations('Home',[
+		'setRegisterDialog'
+	])
 		
 	},
 };

@@ -8,14 +8,34 @@
     &__title{
         text-align: center;
         margin-top: 40px;
+        position: relative;
+        &--btns {
+            position: absolute;
+            right:25px;
+            top:-30px;
+            .bg-transparent {
+                &.el-button {
+                    background:transparent;
+                    border:2px solid $minor-bk-color;
+                    color:$minor-bk-color;
+                }
+            }
+        }
     }
     &__buttons {
         margin:0 auto;
-        
+        background-color:$minor-bk-color;
+        color:$text-color;
+        border:none;
+        border-radius: 5px 0 0 5px;
+        position: relative;
+        height:50px;
+        width:50px;
+        min-width: 50px;
         &__icon {
             height:40px;
             width:40px;
-            z-index:9999;
+            z-index:999;
             position: absolute;
             left: 5px;
             top:5px;
@@ -69,15 +89,7 @@
                         border-radius: 0 5px 5px 0;
                     }
                 }
-                .el-button {
-                    background-color:$minor-bk-color;
-                    color:$text-color;
-                    border:none;
-                    border-radius: 5px 0 0 5px;
-                    position: relative;
-                    height:50px;
-                    width:50px;
-                }
+               
                 .distance {
                     .el-input {
                         &__inner {
@@ -94,6 +106,10 @@
 }
 .el-autocomplete-suggestion li:hover {
     background-color:  rgba($primary-bk-color,0.6)!important;
+}
+
+.el-button {
+    border-radius: 0 !important;
 }
 .el-dropdown {
     &-menu {
