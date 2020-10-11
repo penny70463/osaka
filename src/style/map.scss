@@ -14,10 +14,16 @@
             right:25px;
             top:-30px;
             .bg-transparent {
+                margin-left: 10px;
+                width:100px;
                 &.el-button {
                     background:transparent;
                     border:2px solid $minor-bk-color;
                     color:$minor-bk-color;
+                    &:hover {
+                        color:$text-color;
+                        background: $minor-bk-color
+                    }
                 }
             }
         }

@@ -2,6 +2,9 @@
 	<div class="wrap">
 		<div class="wrap__title">
 			<div class="wrap__title--btns">
+				<i 
+				class="el-icon-user-solid"
+				v-if="userInfo.name"></i>
 				{{userInfo.name}}
 			<el-button 
 			@click="logInStatus ? logOut() :setRegisterDialog({visible:true,type:0})"
@@ -10,16 +13,13 @@
 			</el-button>
 			<el-button
 			v-if="!logInStatus"
+			class="bg-transparent"
 			@click="setRegisterDialog({visible:true,type:1})"
 			>
 				Register
 			</el-button>
+			
 			</div>
-			<!-- <div class="wrap__title--btns">
-			<el-button>
-				Log Out
-			</el-button>
-			</div> -->
 		<h1>
 			Osaka Amazing Pass Free Facilites Information Map
 		</h1>
@@ -66,7 +66,8 @@ export default {
 	]),
 	...mapActions('Home',[
 		'checkUserStatus',
-		'logOut'
+		'logOut',
+		
 	])
 		
 	},

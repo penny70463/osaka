@@ -56,6 +56,7 @@
              @click="setRegisterDialog({visible:false});reset()">
                 Cancel
             </el-button>
+            <div @click="forgetPassword()">Forget password</div>
         </div>
     </el-dialog>
     </ValidationObserver>
@@ -91,7 +92,8 @@ export default {
         ]),
         ...mapActions('Home',[
             'register',
-            'logIn'
+            'logIn',
+            'forgetPassword'
         ]),
         
     },

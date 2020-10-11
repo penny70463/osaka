@@ -87,10 +87,11 @@ export default {
 			
 			)
 		.catch(function(error) {
-			// Handle Errors here.
-			var errorCode = error.code;
-			var errorMessage = error.message;
-			console.log(errorCode,errorMessage)
+			MessageBox.alert('sorry, wrong user information ! Please try again!','error',{
+				callback:()=>{
+					
+				}
+			});
 			// ...
 });
 	},
@@ -113,6 +114,7 @@ export default {
 	},
 	checkUserStatus({commit}) {
 		auth.onAuthStateChanged(function(user) {
+			console.log(user)
 			if (user) {
 				commit('setUserInfo',{name:user.displayName})
 				commit('setLogInStatus',true)
@@ -124,5 +126,14 @@ export default {
 		
 		
 		
+	},
+	forgetPassword({state}) {
+		let {userInfo} = state
+		auth.sendSignInLinkToEmail(userInfo.email,{
+			url: window.location.href,
+			// This must be true.
+			handleCodeInApp: true,
+		})
 	}
+
 };
