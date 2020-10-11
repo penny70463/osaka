@@ -2,13 +2,15 @@
 	<div class="wrap">
 		<div class="wrap__title">
 			<div class="wrap__title--btns">
+				{{userInfo.name}}
 			<el-button 
-			@click="setRegisterDialog({visible:true,register:0})"
+			@click="logInStatus ? logOut() :setRegisterDialog({visible:true,type:0})"
 			class="bg-transparent">
-				Log In
+				{{logInStatus ? 'Log Out': 'Log In'}}
 			</el-button>
 			<el-button
-			@click="setRegisterDialog({visible:true,register:1})"
+			v-if="!logInStatus"
+			@click="setRegisterDialog({visible:true,type:1})"
 			>
 				Register
 			</el-button>
@@ -35,7 +37,7 @@
 	</div>
 </template>
 <script>
-import { mapMutations} from 'vuex'
+import { mapMutations, mapState, mapActions} from 'vuex'
 export default {
 	name: 'NearBy',
 	components: {
@@ -50,14 +52,21 @@ export default {
 		};
 	},
 	mounted() {
-		
+		this.checkUserStatus()
 	},
 	computed: {
-		
+		...mapState('Home',[
+			'userInfo',
+			'logInStatus'
+		])
 	},
 	methods: {
 	...mapMutations('Home',[
 		'setRegisterDialog'
+	]),
+	...mapActions('Home',[
+		'checkUserStatus',
+		'logOut'
 	])
 		
 	},

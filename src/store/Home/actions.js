@@ -1,5 +1,6 @@
 import bus from '../../assets/scripts/eventBus'
 import { MessageBox } from 'element-ui'
+import {auth } from '../../../firestore'
 export default {
 	
 	async queryStringLocations({ commit, state}) {
@@ -46,4 +47,82 @@ export default {
 			zoomControl: state.initialMapSetting.zoomControl.default,
 		});
 	},
+	async register({state,commit}) {
+		let {userInfo} = state
+           auth.createUserWithEmailAndPassword(userInfo.email, userInfo.password)
+            .then(
+                async function(){
+                    await auth.currentUser.updateProfile({
+                    displayName: userInfo.name,
+                    })
+            .then(function() {
+				commit('setUserInfo',{name:auth.currentUser.displayName})
+				commit('setRegisterDialog',{visible:false})
+				})
+            .catch(function(error) {
+                console.log(error)
+            // An error happened.
+            })
+            }
+            )
+            .catch(function(error) {
+            // Handle Errors here.
+            var errorMessage = error.message;
+            console.log(errorMessage)
+            // ...
+            });
+
+	},
+	logIn({state,commit}) {
+		let {userInfo} = state
+		auth.signInWithEmailAndPassword(userInfo.email, userInfo.password)
+		.then(
+			async function(){
+				if(auth.currentUser) {
+					commit('setUserInfo',{name:auth.currentUser.displayName})
+				}
+				commit('setRegisterDialog',{visible:false})
+			
+			}
+			
+			)
+		.catch(function(error) {
+			// Handle Errors here.
+			var errorCode = error.code;
+			var errorMessage = error.message;
+			console.log(errorCode,errorMessage)
+			// ...
+});
+	},
+	logOut({commit}){
+		auth.signOut()
+		  .then(function(){
+			commit('setLogInStatus',false)
+			commit('setUserInfo',{
+				name:'',
+				email:'',
+			   password:''})
+		  }
+			
+		  )
+		  .catch(function(error) {
+			  console.log(error)
+			// An error happened.
+		  });
+
+	},
+	checkUserStatus({commit}) {
+		auth.onAuthStateChanged(function(user) {
+			if (user) {
+				commit('setUserInfo',{name:user.displayName})
+				commit('setLogInStatus',true)
+			  
+			} else {
+			  commit('setLogInStatus',false)
+			}
+		  });
+		
+		
+		
+	}
 };
