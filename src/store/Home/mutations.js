@@ -100,6 +100,11 @@ export const mutations = {
 	setUserInfo(state, info) {
 		state.userInfo = info
 	},
+	resetUserInfo(state) {
+		state.userInfo.name = ''
+		state.userInfo.password = ''
+		state.userInfo.email = ''
+	},
 	setLogInStatus(state,bool) {
 		state.logInStatus = bool
 	}

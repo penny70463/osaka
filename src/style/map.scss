@@ -107,6 +107,22 @@
         }
     }
 }
+
+.el-dialog {
+    &__header {
+        background: $primary-bk-color;
+    }
+
+    &__body {
+
+    }
+
+    &__footer {
+
+    }
+}
+
+
 .el-autocomplete {
     width:205px;
 }

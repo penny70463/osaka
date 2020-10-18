@@ -129,7 +129,7 @@ export default {
 	},
 	forgetPassword({state}) {
 		let {userInfo} = state
-		auth.sendSignInLinkToEmail(userInfo.email,{
+		auth.sendPasswordResetEmail(userInfo.email,{
 			url: window.location.href,
 			// This must be true.
 			handleCodeInApp: true,

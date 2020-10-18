@@ -3,8 +3,13 @@
     <el-dialog 
         :visible="visible"
         :close-on-click-modal="true"
-        :show-close="false">
-        <div>
+        :show-close="false"
+        class="dialog"
+        @closed="reset();resetUserInfo()">
+        <div 
+            slot="title"
+            class="dialog__header">{{registerDialog.type ? 'register' : 'logIn'}}</div>
+        <div class="dialog__body">
             <div v-if="registerDialog.type == 1">
                  name
             <ValidationProvider
@@ -14,7 +19,7 @@
                 class="validator"
                 >
                 <el-input
-                :class="{'err':errors.name && errors.name}"
+                :class="{'err':errors.name && errors.name.length}"
                 v-model="name"
                 >
                 </el-input>
@@ -41,14 +46,16 @@
                 tag="div"
                 class="validator"
                 >
-            <el-input v-model="password">
+            <el-input 
+                v-model="password"
+                :class="{'err':errors.password && errors.password.length}">
 
             </el-input>
             </ValidationProvider>
         </div>
-        <div>
+        <div class="dialog__footer">
             <el-button 
-                @click="registerDialog.type ? register() : logIn()"
+                @click="handleSubmit(()=>registerDialog.type ? register() : logIn())"
                 >
                 Confirm
             </el-button>
@@ -88,7 +95,8 @@ export default {
     },
     methods: {
         ...mapMutations('Home',[
-            'setRegisterDialog'
+            'setRegisterDialog',
+            'resetUserInfo'
         ]),
         ...mapActions('Home',[
             'register',
