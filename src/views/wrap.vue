@@ -1,10 +1,11 @@
 <template>
 	<div class="wrap">
 		<div class="wrap__title">
-			<div class="wrap__title--btns">
+			<div class="wrap__title--btns" :key="userInfo.name">
 				<i 
 				class="el-icon-user-solid"
-				v-if="userInfo.name"></i>
+				v-if="userInfo.name"
+				></i>
 				{{userInfo.name}}
 			<el-button 
 			@click="logInStatus ? logOut() :setRegisterDialog({visible:true,type:0})"
@@ -52,7 +53,7 @@ export default {
 		};
 	},
 	mounted() {
-		this.checkUserStatus()
+		// this.checkUserStatus()
 	},
 	computed: {
 		...mapState('Home',[

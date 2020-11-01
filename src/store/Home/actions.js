@@ -1,5 +1,5 @@
 import bus from '../../assets/scripts/eventBus'
-import { MessageBox } from 'element-ui'
+import { MessageBox, Message } from 'element-ui'
 import {auth } from '../../../firestore'
 export default {
 	
@@ -77,16 +77,20 @@ export default {
 		let {userInfo} = state
 		auth.signInWithEmailAndPassword(userInfo.email, userInfo.password)
 		.then(
+			
 			async function(){
+				commit('setRegisterDialog',{visible:false});
 				if(auth.currentUser) {
 					commit('setUserInfo',{name:auth.currentUser.displayName})
 				}
-				commit('setRegisterDialog',{visible:false})
+				commit('setLogInStatus',true)
+				
 			
 			}
 			
 			)
 		.catch(function(error) {
+			console.log(error)
 			MessageBox.alert('sorry, wrong user information ! Please try again!','error',{
 				callback:()=>{
 					
@@ -114,11 +118,9 @@ export default {
 	},
 	checkUserStatus({commit}) {
 		auth.onAuthStateChanged(function(user) {
-			console.log(user)
 			if (user) {
 				commit('setUserInfo',{name:user.displayName})
 				commit('setLogInStatus',true)
-			  
 			} else {
 			  commit('setLogInStatus',false)
 			}
@@ -127,13 +129,14 @@ export default {
 		
 		
 	},
-	forgetPassword({state}) {
+	async resetPassword({state}) {
 		let {userInfo} = state
-		auth.sendPasswordResetEmail(userInfo.email,{
-			url: window.location.href,
-			// This must be true.
-			handleCodeInApp: true,
-		})
+		await auth.sendPasswordResetEmail(userInfo.email,{
+				url: window.location.href,
+				handleCodeInApp: true,
+			}).then(()=> Message.success(`Please Check your email：${userInfo.email} to reset password!`))
+			.catch((error)=>Message.error(error.message))
+
 	}
 
 };

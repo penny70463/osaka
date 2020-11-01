@@ -5,7 +5,7 @@
         :close-on-click-modal="true"
         :show-close="false"
         class="dialog"
-        @closed="reset();resetUserInfo()">
+        @closed="reset();resetTempUserInfo()">
         <div 
             slot="title"
             class="dialog__header">{{registerDialog.type ? 'register' : 'logIn'}}</div>
@@ -63,7 +63,7 @@
              @click="setRegisterDialog({visible:false});reset()">
                 Cancel
             </el-button>
-            <div @click="forgetPassword()">Forget password</div>
+            <div @click="resetPassword()" class="fix-content cursor-pointer">reset password</div>
         </div>
     </el-dialog>
     </ValidationObserver>
@@ -96,12 +96,12 @@ export default {
     methods: {
         ...mapMutations('Home',[
             'setRegisterDialog',
-            'resetUserInfo'
+            'resetTempUserInfo'
         ]),
         ...mapActions('Home',[
             'register',
             'logIn',
-            'forgetPassword'
+            'resetPassword'
         ]),
         
     },
