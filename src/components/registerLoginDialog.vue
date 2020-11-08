@@ -3,14 +3,14 @@
     <el-dialog 
         :visible="visible"
         :close-on-click-modal="true"
-        :show-close="false"
+        :show-close="true"
         class="dialog"
         @closed="reset();resetTempUserInfo()">
         <div 
             slot="title"
             class="dialog__header">{{registerDialog.type ? 'register' : 'logIn'}}</div>
         <div class="dialog__body">
-            <div v-if="registerDialog.type == 1">
+            <div v-if="registerDialog.type == 1" class="dialog__body--column">
                  name
             <ValidationProvider
                 name="name"
@@ -25,8 +25,8 @@
                 </el-input>
             </ValidationProvider>
             </div>
-           
-            e-mail
+           <div class="dialog__body--column">
+                e-mail
             <ValidationProvider
                 name="email"
                 :rules="{required:true,email:true}"
@@ -39,7 +39,10 @@
                 >
                 </el-input>
             </ValidationProvider>
-            password
+           </div>
+           
+           <div class="dialog__body--column">
+               password
              <ValidationProvider
                 name="password"
                 :rules="{required:true}"
@@ -52,9 +55,12 @@
 
             </el-input>
             </ValidationProvider>
+           </div>
+            
         </div>
         <div class="dialog__footer">
-            <el-button 
+            <div class="btn-wrap">
+                <el-button 
                 @click="handleSubmit(()=>registerDialog.type ? register() : logIn())"
                 >
                 Confirm
@@ -63,7 +69,11 @@
              @click="setRegisterDialog({visible:false});reset()">
                 Cancel
             </el-button>
-            <div @click="resetPassword()" class="fix-content cursor-pointer">reset password</div>
+            </div>
+            
+            <div @click="resetPassword()" class="fix-content cursor-pointer hover-text-color">
+                reset password
+                </div>
         </div>
     </el-dialog>
     </ValidationObserver>

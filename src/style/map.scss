@@ -108,62 +108,7 @@
     }
 }
 
-.el-dialog {
-    &__header {
-        background: $minor-bk-color;
-    }
 
-    &__body {
-
-    }
-
-    &__footer {
-
-    }
-}
-
-
-.el-autocomplete {
-    width:205px;
-}
-.el-autocomplete-suggestion li:hover {
-    background-color:  rgba($primary-bk-color,0.6)!important;
-}
-
-.el-button {
-    border-radius: 0 !important;
-}
-.el-dropdown {
-    &-menu {
-        width:110px;
-        border: 1px solid $primary-bk-color!important;
-        &__item {
-            //width:135px;
-            .flag {
-                display: flex;
-                align-items: center;
-                img {
-                    width:24px;
-                    height:24px;
-                    margin-right: 5px;
-                }
-                .nation {
-                    @media (max-width:1279px) {
-                       
-                    }
-                }
-            }
-            &:not(.is-disabled):hover {
-                background-color: rgba($primary-bk-color,0.6) !important;
-                color:$minor-bk-color!important;
-            }
-        }
-    }
-    &__caret-button {
-        width:30px;
-    }
-   
-}
 
 .button-wrap {
     .el-button {
@@ -189,6 +134,7 @@
         }
     }
 }
+
 .info-area {
     display:flex;
     flex-direction: column;
@@ -228,6 +174,23 @@
                    }
                }
            }
+    }
+}
+
+.dialog {
+    &__body {
+        &--column {
+            margin: 5px 0;
+        }
+    }
+
+    &__footer {
+        .btn-wrap {
+            margin: 10px 0;
+            display: flex;
+            justify-content: flex-end;
+        
+        }
     }
 }
 //google map info dialog
