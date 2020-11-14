@@ -62,7 +62,9 @@ export const state = {
 			comment:'',
 			rate:0,
 		}
-	]
+	],
+	ratingCommentsRef:[],
+	ratingCommentsRefId:'',
 };
 export const mutations = {
 	updateField,
@@ -142,5 +144,12 @@ export const mutations = {
 
 	setRatingComments(state,list) {
 		state.ratingComments = list
+	},
+	setRatingCommentsRef(state,list) {
+		state.ratingCommentsRef = list
+	},
+
+	setRatingCommentsRefId(state,id) {
+		state.ratingCommentsRefId = id
 	}
 }

@@ -22,6 +22,7 @@
 						placeholder="search locations near by"
 						:clearable="true"
 						@select="setQueryString({type:1,string:tempQueryString})"
+						@keydown.13.native="handleSubmit(queryStringLocations)"
 						>
 						</el-autocomplete>
 				<!-- <el-input
@@ -51,6 +52,7 @@
 					class="distance"
 					placeholder="distance"
 					:class="{'err':errors.distance && errors.distance.length}"
+					@keydown.13.native="handleSubmit(queryStringLocations)"
 				>
 					<template slot="append">
 						km

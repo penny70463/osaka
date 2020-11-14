@@ -22,7 +22,7 @@
         </div>
     </div>
     <div class="dialog__footer">
-        <el-button @click="infoRatingType ? Rating(): infoRatingType()">{{ infoRatingType ? 'Submit':'Ok'}}</el-button>
+        <el-button @click="infoRatingType ? Rating(): setInfoRatingVisible(false)">{{ infoRatingType ? 'Submit':'Ok'}}</el-button>
     </div>
     </el-dialog>
 </template>

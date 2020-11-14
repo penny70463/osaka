@@ -243,15 +243,12 @@ export default {
 				<br>
 				<span>${JSON.parse(JSON.stringify(elm.dm.proto.fields[langContent])).stringValue}</span>`
 			
-			if(!elm.dm.proto.fields.ratings) {
-				db.collection(`2020-4-6`).doc(elm.id).update({
-							ratings: []})
-			}
 			google.maps.event.addListener(infowindow, 'domready',function( ){
 				let rating = document.getElementById('rating')
 				let comments = document.getElementById('comments')
 
 				let temp=[]
+				if(elm.dm.proto.fields.ratings && elm.dm.proto.fields.ratings.arrayValue.values) {
 					elm.dm.proto.fields.ratings.arrayValue.values.forEach(elm=>{
 						temp.push({
 							userName:elm.mapValue.fields.userName.stringValue,
@@ -259,19 +256,10 @@ export default {
 							comment:elm.mapValue.fields.comment.stringValue,
 						})
 					})
-
+				}
+				store.commit('Home/setRatingCommentsRef',temp)
+				store.commit('Home/setRatingCommentsRefId',elm.id)
 				rating.onclick = function() {
-					if(store.state.Home.logInStatus) {
-						if(temp.some(elm=>{
-							return elm.userName == store.state.Home.userInfo.name
-						})){
-							MessageBox.alert('You have comment alredy!','hint',{
-							})
-							return
-						}
-						
-					} 
-					
 					store.dispatch('Home/goRating',1)
 			}
 				comments.onclick = function() {
@@ -295,16 +283,16 @@ export default {
 		},
 		
 		dbImport() {
-			// db.collection(`2020-4-6`).get().then((doc)=>{
-			// 		doc.docs.forEach((elm,i)=> {
-			// 			//若無info , call map API補齊
-			// 			if(!elm.dm.proto.fields.info) {
-			// 				console.log(elm.dm.proto.fields.info,elm)
-			// 				this.getInfoFromQuery(elm,i)
-			// 			}
+			db.collection(`2020-4-6`).get().then((doc)=>{
+					doc.docs.forEach((elm,i)=> {
+						//若無info , call map API補齊
+						if(!elm.dm.proto.fields.ratings) {
+							db.collection(`2020-4-6`).doc(elm.id).update({ratings: []})
+							console.log(elm.dm.proto.fields.name)
+						}
 					
-			// 	})
-			// })
+				})
+			})
 		},
 	},
 	beforeDestroy() {

@@ -1,6 +1,6 @@
 import bus from '../../assets/scripts/eventBus'
 import { MessageBox, Message } from 'element-ui'
-import {auth } from '../../../firestore'
+import {auth, db } from '../../../firestore'
 export default {
 	
 	async queryStringLocations({ commit, state}) {
@@ -74,8 +74,8 @@ export default {
 
 	},
 	logIn({state,commit}) {
-		let {userInfo} = state
-		auth.signInWithEmailAndPassword(userInfo.email, userInfo.password)
+		let {tempUserInfo:{email,password}} = state
+		auth.signInWithEmailAndPassword(email, password)
 		.then(
 			
 			async function(){
@@ -142,12 +142,26 @@ export default {
 	},
 	goRating({state, commit},type){
 		//type 1: go rating , type 0: view comments
-		let {logInStatus, userInfo:{name}} = state
+		let {logInStatus, userInfo:{name},ratingCommentsRef} = state
 		commit('setInfoRatingType',type)
 		if(!type) {
-			commit('setInfoRatingVisible',true)
+			if(ratingCommentsRef.length) {
+				commit('setInfoRatingVisible',true)
+			} else {
+				MessageBox.alert('No comments yet!','hint',{
+					
+				})
+			}
+			
 		} else {
 			if(logInStatus) {
+				if(ratingCommentsRef.some(elm=>{
+					return elm.userName == name
+				})){
+					MessageBox.alert('You have comment alredy!','hint',{
+					})
+					return
+				}
 				commit('setRatingComments',[
 					{
 						userName:name,
@@ -164,8 +178,12 @@ export default {
 		}
 		
 	},
-	Rating() {
-		
+	Rating({state, commit}) {
+		let { ratingComments,ratingCommentsRef, ratingCommentsRefId } = state
+		db.collection(`2020-4-6`).doc(ratingCommentsRefId).update({
+			ratings: ratingCommentsRef.concat(ratingComments)})
+			commit('setInfoRatingVisible',false)
+			Message.success(`success! Your rating will be updated in few minutes!`)
 	}
 
 };

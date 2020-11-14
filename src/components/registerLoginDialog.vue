@@ -51,6 +51,7 @@
                 >
             <el-input 
                 v-model="password"
+                :show-password="true"
                 :class="{'err':errors.password && errors.password.length}">
 
             </el-input>
@@ -94,9 +95,9 @@ export default {
     computed: {
         ...mapFields('Home',[
             'registerDialog.visible',
-            'userInfo.email',
-            'userInfo.password',
-            'userInfo.name'
+            'tempUserInfo.email',
+            'tempUserInfo.password',
+            'tempUserInfo.name'
         ]),
         ...mapState('Home',[
             'registerDialog',
