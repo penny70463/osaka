@@ -83,6 +83,7 @@ export default {
 				if(auth.currentUser) {
 					commit('setUserInfo',{name:auth.currentUser.displayName})
 				}
+				
 				commit('setLogInStatus',true)
 				
 			
@@ -107,8 +108,9 @@ export default {
 				name:'',
 				email:'',
 			   password:''})
+			   Message.success(`You have log out!`)
 		  }
-			
+		  
 		  )
 		  .catch(function(error) {
 			  console.log(error)
@@ -137,6 +139,33 @@ export default {
 			}).then(()=> Message.success(`Please Check your email：${userInfo.email} to reset password!`))
 			.catch((error)=>Message.error(error.message))
 
+	},
+	goRating({state, commit},type){
+		//type 1: go rating , type 0: view comments
+		let {logInStatus, userInfo:{name}} = state
+		commit('setInfoRatingType',type)
+		if(!type) {
+			commit('setInfoRatingVisible',true)
+		} else {
+			if(logInStatus) {
+				commit('setRatingComments',[
+					{
+						userName:name,
+						comment:'',
+						rate:0,
+					}
+				])
+				commit('setInfoRatingVisible',true)
+			} else {
+				MessageBox.alert('Please Log in!','hint',{
+					
+				})
+			}
+		}
+		
+	},
+	Rating() {
+		
 	}
 
 };

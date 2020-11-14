@@ -54,6 +54,15 @@ export const state = {
 		name:''
 	},
 	logInStatus:false,
+	infoRatingVisible:false,
+	infoRatingType:0,
+	ratingComments:[
+		{
+			userName:'',
+			comment:'',
+			rate:0,
+		}
+	]
 };
 export const mutations = {
 	updateField,
@@ -112,5 +121,26 @@ export const mutations = {
 	},
 	setLogInStatus(state,bool) {
 		state.logInStatus = bool
+	},
+
+	setInfoRatingVisible(state,bool) {
+		state.infoRatingVisible = bool
+	},
+
+	setInfoRatingType(state,val){
+		state.infoRatingType = val
+	},
+
+	resetRatingComments(state){
+		state.ratingComments= [
+			{
+				comment:'',
+				rate:0,
+			}
+		]
+	},
+
+	setRatingComments(state,list) {
+		state.ratingComments = list
 	}
 }

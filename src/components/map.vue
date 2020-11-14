@@ -220,25 +220,75 @@ export default {
 			this.markerInfo(marker,elm)
 			
 		},
-
+		
 		//經緯度create Marker
 		async markerInfo(marker,elm) {
 			let language=this.lang
-			google.maps.event.addListener(marker, 'click', function() {
+			let store = this.$store
+			await google.maps.event.addListener(marker, 'click', function() {
 				let infowindow = new google.maps.InfoWindow({
 				});
 			let langName = language == 'tc' ? 'name' : `${language}Name`	
 			let langContent = language == 'tc' ? 'content' : `${language}Content`
-			infowindow.setContent(
-				elm.name ? `<div class="location-name">${elm.name}</div>`:
+			let infoDiv = document.createElement('div')
+			infoDiv.innerHTML = elm.name ? `<div class="location-name">${elm.name}</div>`:
 				`<div class="location-name">${elm.dm.proto.fields[langName].stringValue}</div>
+				<div class="operate-wrap">
+					<div id="rating" class="operate">Go Rating</div>
+					<div id="comments" class="operate">View Comments</div>
+				</div>
+				
 				<hr>
 				<span class="location-address">${elm.dm.proto.fields.info.mapValue.fields.address.stringValue}</span>
 				<br>
 				<span>${JSON.parse(JSON.stringify(elm.dm.proto.fields[langContent])).stringValue}</span>`
-				);
+			
+			if(!elm.dm.proto.fields.ratings) {
+				db.collection(`2020-4-6`).doc(elm.id).update({
+							ratings: []})
+			}
+			google.maps.event.addListener(infowindow, 'domready',function( ){
+				let rating = document.getElementById('rating')
+				let comments = document.getElementById('comments')
+
+				let temp=[]
+					elm.dm.proto.fields.ratings.arrayValue.values.forEach(elm=>{
+						temp.push({
+							userName:elm.mapValue.fields.userName.stringValue,
+							rate:Number(elm.mapValue.fields.rate.integerValue),
+							comment:elm.mapValue.fields.comment.stringValue,
+						})
+					})
+
+				rating.onclick = function() {
+					if(store.state.Home.logInStatus) {
+						if(temp.some(elm=>{
+							return elm.userName == store.state.Home.userInfo.name
+						})){
+							MessageBox.alert('You have comment alredy!','hint',{
+							})
+							return
+						}
+						
+					} 
+					
+					store.dispatch('Home/goRating',1)
+			}
+				comments.onclick = function() {
+					store.commit('Home/setRatingComments',temp)
+					store.dispatch('Home/goRating',0)
+				}
+			})
+				
+			 infowindow.setContent(infoDiv);
 			infowindow.open(this.map, marker);
+			
 			});
+			
+			
+				
+			
+			
 			this.$store.commit('Home/setInitialMapSetting', {name:'center',data:{ lat:this.currPosition.lat, lng:this.currPosition.lng}})
 			 this.resetCenter();	
 			 this.$store.commit('setLoading',false)

@@ -44,6 +44,9 @@
 
 .el-button {
     border-radius: 0 !important;
+    &:focus {
+        color:#000000ab !important;
+    }
 }
 .el-dropdown {
     &-menu {

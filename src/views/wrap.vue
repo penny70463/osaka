@@ -35,6 +35,7 @@
 			<mapUnit  />
 		</div>
 		<registerDialog />
+		<infoRatingDialog />
 	</div>
 </template>
 <script>
@@ -46,6 +47,7 @@ export default {
 		query:()=>import('../components/query'),
 		lang:()=>import('../components/lang'),
 		registerDialog:()=>import('../components/registerLoginDialog'),
+		infoRatingDialog:()=>import('../components/infoRatingDialog')
 	},
 	data() {
 		return {

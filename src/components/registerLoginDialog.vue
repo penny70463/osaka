@@ -1,7 +1,7 @@
 <template>
 <ValidationObserver v-slot="{handleSubmit,errors,reset}">
     <el-dialog 
-        :visible="visible"
+        :visible.sync="visible"
         :close-on-click-modal="true"
         :show-close="true"
         class="dialog"

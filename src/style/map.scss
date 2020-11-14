@@ -113,7 +113,7 @@
 .button-wrap {
     .el-button {
         width:85px;
-        color:#000000ab;;
+        color:#000000ab;
     }
     .box-shadow {
         border: 1px solid #ffffffb5;
@@ -209,6 +209,24 @@
 }
 .location-name {
     font-weight: 500;
+}
+
+.operate-wrap {
+    display: flex;
+    width: 180px;
+    justify-content: space-between;
+    margin: 5px 0;
+    .operate {
+        border: 1px solid $primary-bk-color;
+        padding: 2px 5px;
+        border-radius: $border-radius;
+        color: $primary-bk-color;
+        &:hover {
+            color: $text-color;
+            background: $primary-bk-color;
+            cursor: pointer;
+        }
+    }
 }
 
 .err {
