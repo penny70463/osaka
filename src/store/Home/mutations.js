@@ -65,6 +65,10 @@ export const state = {
 	],
 	ratingCommentsRef:[],
 	ratingCommentsRefId:'',
+	rateSum:{
+		count:0,
+		ave:0,
+	}
 };
 export const mutations = {
 	updateField,
@@ -151,5 +155,8 @@ export const mutations = {
 
 	setRatingCommentsRefId(state,id) {
 		state.ratingCommentsRefId = id
-	}
+	},
+	setRateSum(state, data) {
+		state.rateSum = data
+	},
 }

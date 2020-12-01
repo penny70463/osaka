@@ -232,7 +232,7 @@ export default {
 			let langContent = language == 'tc' ? 'content' : `${language}Content`
 			let infoDiv = document.createElement('div')
 			infoDiv.innerHTML = elm.name ? `<div class="location-name">${elm.name}</div>`:
-				`<div class="location-name">${elm.dm.proto.fields[langName].stringValue}</div>
+				`<div class="location-name">${elm.dm.proto.fields[langName].stringValue}<div>Rating: ${store.state.Home.rateSum.ave} ( ${store.state.Home.rateSum.count} Reviews )</div></div>
 				<div class="operate-wrap">
 					<div id="rating" class="operate">Go Rating</div>
 					<div id="comments" class="operate">View Comments</div>
@@ -248,6 +248,7 @@ export default {
 				let comments = document.getElementById('comments')
 
 				let temp=[]
+				let tempAve = []
 				if(elm.dm.proto.fields.ratings && elm.dm.proto.fields.ratings.arrayValue.values) {
 					elm.dm.proto.fields.ratings.arrayValue.values.forEach(elm=>{
 						temp.push({
@@ -255,8 +256,15 @@ export default {
 							rate:Number(elm.mapValue.fields.rate.integerValue),
 							comment:elm.mapValue.fields.comment.stringValue,
 						})
+						tempAve.push(Number(elm.mapValue.fields.rate.integerValue))
 					})
 				}
+				
+				let average = (array) => array.reduce((a, b) => a + b) / array.length;
+				store.commit('Home/setRateSum',{
+					count:tempAve.length,
+					ave: average(tempAve).toFixed(1)
+				})
 				store.commit('Home/setRatingCommentsRef',temp)
 				store.commit('Home/setRatingCommentsRefId',elm.id)
 				rating.onclick = function() {
