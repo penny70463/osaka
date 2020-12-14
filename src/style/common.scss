@@ -12,6 +12,11 @@
     }
 }
 
+.flex-column {
+    display:flex;
+    flex-direction: column;
+}
+
 .el-message-box {
     @media (max-width:450px) {
         width:90% !important;
@@ -21,10 +26,12 @@
 .el-dialog {
     border-radius: $border-radius!important;
     background: $dialog-bg-color !important;
+    max-width: 600px;
     @media (max-width:450px) {
         width:90% !important;
     }
     &__header {
+        padding: 15px 20px !important;
         background: $minor-bk-color;
         border-top-left-radius: $border-radius;
         border-top-right-radius :$border-radius;

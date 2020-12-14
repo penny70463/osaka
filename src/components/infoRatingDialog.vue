@@ -2,28 +2,78 @@
     <el-dialog 
     :visible.sync="infoRatingVisible"
     :close-on-click-modal="true"
-    class="dialog">
-    <div v-for="({userName, comment, rate},i) in ratingComments"
-        :key="i"
-        class="dialog__body">
-        <span class="dialog__body--column">{{userName}}</span>
-          <el-rate
-          class="dialog__body--column"
-            v-model="ratingComments[i].rate"
+    class="dialog"
+    @closed="setInfoRatingType(0);resetRatingCommentsRef()"
+    >
+  <div 
+    slot="title"
+    class="dialog__header">{{locationInfo.name}}</div>
+
+<div class="dialog__body">
+    <el-rate
+            v-model="rateSum.ave"
+            disabled
+            show-score
             :colors="colors"
-            :disabled="!infoRatingType">
-        </el-rate>
-        <div class="dialog__body--column">
-            <span>Comment:</span>
-            <el-input 
-                v-if="infoRatingType"
-                v-model="ratingComments[i].comment"/>
-            <span v-else>{{comment}}</span>
+            text-color="#ff9900"
+            :score-template="`${rateSum.ave} points ( ${rateSum.count} Reviews )`">
+    </el-rate>
+    <hr>
+    <div>{{`Address: ${locationInfo.address}`}}</div>
+    <hr>
+    <div>{{`Information: ${locationInfo.content}`}}</div>
+    <div v-if="!infoRatingType">
+            <div v-for="({userName, comment, rate},i) in ratingComments"
+            :key="i"
+            class="comments"
+            >
+            
+            <span class="dialog__body--column">{{`${userName} : ${comment} `}}</span>
+            <el-rate
+                :value="ratingComments[i].rate"
+                :colors="colors"
+                disabled
+                >
+            </el-rate>
+            <!-- <div class="dialog__body--column">
+                <span>Comment:</span>
+                <span>{{comment}}</span>
+            </div> -->
         </div>
+         <div class="dialog__body--column" v-if="!ratingComments.length">
+        No comments yet!
+        </div>
+        <span class="operate" @click="setInfoRatingType(1)">{{'Go Rating >>'}}</span>
     </div>
-    <div class="dialog__footer">
+    <div v-else class="flex-column">
+         <span class="dialog__body--column">{{userInfo.name}}</span>
+            <el-rate
+                class="dialog__body--column"
+                v-model="ratingCommentsRef.rate"
+                :colors="colors"
+                >
+            </el-rate>
+            <div class="dialog__body--column">
+                <span>Comment:</span>
+            </div>
+            <div class="dialog__body--column">
+                <el-input 
+                    v-model="ratingCommentsRef.comment">
+                    <el-button slot="append" @click="rateCheck()">{{ 'Rate'}}</el-button>
+                </el-input>
+            </div>
+            <div class="dialog__body--column">
+                <span class="operate" @click="setInfoRatingType(0)">{{' << Back to Comments'}}</span>
+                
+            </div>
+            
+            
+    </div>
+</div>
+    
+    <!-- <div class="dialog__footer">
         <el-button @click="infoRatingType ? Rating(): setInfoRatingVisible(false)">{{ infoRatingType ? 'Submit':'Ok'}}</el-button>
-    </div>
+    </div> -->
     </el-dialog>
 </template>
 <script>
@@ -37,24 +87,28 @@ export default {
     },
     computed: {
         ...mapFields('Home',[
-            'infoRatingVisible'
+            'infoRatingVisible',
+            'ratingCommentsRef',
+
         ]),
-        ...mapMultiRowFields('Home',[
-            'ratingComments.rate',
-            'ratingComments.comment'
-        ]),
+        
         ...mapState('Home',[
             'ratingComments',
-            'infoRatingType'
+            'infoRatingType',
+            'locationInfo',
+            'rateSum',
+            'userInfo'
         ])
     },
 
     methods: {
         ...mapMutations('Home',[
-            'setInfoRatingVisible'
+            'setInfoRatingVisible',
+            'setInfoRatingType',
+            'resetRatingCommentsRef'
         ]),
         ...mapActions('Home',[
-            'Rating'
+            'rateCheck'
         ])
     },
 }

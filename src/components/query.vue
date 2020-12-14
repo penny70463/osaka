@@ -111,7 +111,7 @@ export default {
     ]),
     querySearch(queryString, cb) {
         // 调用 callback 返回建议列表的数据
-        cb([{'value':'your location'}]);
+        cb([{'value':'my location'}]);
       },
 },
 }

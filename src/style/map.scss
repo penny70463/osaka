@@ -179,6 +179,12 @@
 
 .dialog {
     &__body {
+        hr {
+            opacity: .5;
+        }
+        .comments {
+            margin: 10px 0;
+        }
         &--column {
             margin: 5px 0;
         }
@@ -191,6 +197,29 @@
             justify-content: flex-end;
         
         }
+    }
+    .el-button {
+        background: $text-color;
+        color:$minor-bk-color;
+        &:hover {
+            background: $minor-bk-color;
+            color:$text-color;
+        }
+        &:focus {
+            color:$primary-bk-color !important;
+        }
+    }
+    .el-input-group__append {
+        .el-button {
+            background: $text-color;
+            color:$minor-bk-color;
+            &:hover {
+                background: $minor-bk-color;
+                color:$text-color;
+            }
+        }
+
+        
     }
 }
 //google map info dialog
@@ -211,23 +240,19 @@
     font-weight: 500;
 }
 
-.operate-wrap {
-    display: flex;
-    width: 180px;
-    justify-content: space-between;
-    margin: 5px 0;
-    .operate {
-        border: 1px solid $primary-bk-color;
-        padding: 2px 5px;
-        border-radius: $border-radius;
-        color: $primary-bk-color;
-        &:hover {
-            color: $text-color;
-            background: $primary-bk-color;
-            cursor: pointer;
-        }
+
+.operate {
+    border: 1px solid $primary-bk-color;
+    padding: 2px 5px;
+    border-radius: $border-radius;
+    color: $primary-bk-color;
+    &:hover {
+        color: $text-color;
+        background: $primary-bk-color;
+        cursor: pointer;
     }
 }
+
 
 .err {
     .el-input__inner {

@@ -6,8 +6,8 @@ export default {
 	async queryStringLocations({ commit, state}) {
 		commit('setLoading',true, {root:true})
 		let { tempQueryString } = state;
-		let eventType = tempQueryString === 'your location' ? 0 : 1
-		if(tempQueryString === 'your location') {
+		let eventType = tempQueryString === 'my location' ? 0 : 1
+		if(tempQueryString === 'my location') {
 			if(navigator.geolocation) {
 				  // 跟使用者拿所在位置的權限
 				  navigator.geolocation.getCurrentPosition(
@@ -16,6 +16,7 @@ export default {
 							bus.$emit('queryString',{ eventType:eventType, });
 						}, function() {
 						MessageBox.alert('sorry, positioning failed','hint',{
+							confirmButtonText: 'OK',
 							callback:()=>{
 								commit('setLoading',false, {root:true})
 							}
@@ -24,6 +25,7 @@ export default {
 				
 			} else {
 				MessageBox.alert('sorry, your device doesn\'t support for positioning','hint',{
+					confirmButtonText: 'OK',
 					callback:()=>{
 						commit('setLoading',false, {root:true})
 					}
@@ -48,28 +50,37 @@ export default {
 		});
 	},
 	async register({state,commit}) {
-		let {userInfo} = state
-           auth.createUserWithEmailAndPassword(userInfo.email, userInfo.password)
+		let {tempUserInfo:{ email, password, name }} = state
+           auth.createUserWithEmailAndPassword(email, password)
             .then(
                 async function(){
                     await auth.currentUser.updateProfile({
-                    displayName: userInfo.name,
+                    displayName: name,
                     })
-            .then(function() {
-				commit('setUserInfo',{name:auth.currentUser.displayName})
+            	.then(function() {
+				// commit('setUserInfo',{ name })
 				commit('setRegisterDialog',{visible:false})
+				Message.success(`success! Please log in!`)
 				})
-            .catch(function(error) {
-                console.log(error)
-            // An error happened.
+            	.catch(function(error) {
+					MessageBox.alert(`${error.errorMessage}`,'error',{
+						confirmButtonText: 'OK',
+						callback:()=>{
+							
+						}
+					});
             })
             }
             )
             .catch(function(error) {
             // Handle Errors here.
-            var errorMessage = error.message;
-            console.log(errorMessage)
-            // ...
+			var errorMessage = error.message;
+			MessageBox.alert(`${errorMessage}`,'error',{
+				confirmButtonText: 'OK',
+				callback:()=>{
+					
+				}
+			});
             });
 
 	},
@@ -77,22 +88,20 @@ export default {
 		let {tempUserInfo:{email,password}} = state
 		auth.signInWithEmailAndPassword(email, password)
 		.then(
-			
 			async function(){
 				commit('setRegisterDialog',{visible:false});
 				if(auth.currentUser) {
 					commit('setUserInfo',{name:auth.currentUser.displayName})
 				}
-				
 				commit('setLogInStatus',true)
-				
-			
+				Message.success(`success!`)
 			}
 			
 			)
 		.catch(function(error) {
 			console.log(error)
 			MessageBox.alert('sorry, wrong user information ! Please try again!','error',{
+				confirmButtonText: 'OK',
 				callback:()=>{
 					
 				}
@@ -132,56 +141,31 @@ export default {
 		
 	},
 	async resetPassword({state}) {
-		let {userInfo} = state
-		await auth.sendPasswordResetEmail(userInfo.email,{
+		let { tempUserInfo: { email, }} = state
+		await auth.sendPasswordResetEmail(email,{
 				url: window.location.href,
 				handleCodeInApp: true,
-			}).then(()=> Message.success(`Please Check your email：${userInfo.email} to reset password!`))
+			}).then(()=> Message.success(`Please Check your email：${email} to reset password!`))
 			.catch((error)=>Message.error(error.message))
 
 	},
-	goRating({state, commit},type){
-		//type 1: go rating , type 0: view comments
-		let {logInStatus, userInfo:{name},ratingCommentsRef} = state
-		commit('setInfoRatingType',type)
-		if(!type) {
-			if(ratingCommentsRef.length) {
-				commit('setInfoRatingVisible',true)
-			} else {
-				MessageBox.alert('No comments yet!','hint',{
-					
-				})
-			}
-			
-		} else {
-			if(logInStatus) {
-				if(ratingCommentsRef.some(elm=>{
-					return elm.userName == name
-				})){
-					MessageBox.alert('You have comment alredy!','hint',{
-					})
-					return
-				}
-				commit('setRatingComments',[
-					{
-						userName:name,
-						comment:'',
-						rate:0,
-					}
-				])
-				commit('setInfoRatingVisible',true)
-			} else {
-				MessageBox.alert('Please Log in!','hint',{
-					
-				})
-			}
-		}
-		
+	rateCheck({dispatch}) {
+		MessageBox.confirm('Are you sure to submit?','hint',{
+			confirmButtonText: 'submit',
+			cancelButtonText: 'cancel',
+		})
+		.then(()=>{
+			dispatch('rating')
+		})
+		.catch(()=>{
+			return
+		})
 	},
-	Rating({state, commit}) {
-		let { ratingComments,ratingCommentsRef, ratingCommentsRefId } = state
+	rating({state, commit}) {
+		let { ratingComments,ratingCommentsRef, ratingCommentsRefId,userInfo: { name } } = state
+		ratingCommentsRef.userName = name
 		db.collection(`2020-4-6`).doc(ratingCommentsRefId).update({
-			ratings: ratingCommentsRef.concat(ratingComments)})
+			ratings: [ratingCommentsRef].concat(ratingComments)})
 			commit('setInfoRatingVisible',false)
 			Message.success(`success! Your rating will be updated in few minutes!`)
 	}

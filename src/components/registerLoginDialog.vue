@@ -8,7 +8,7 @@
         @closed="reset();resetTempUserInfo()">
         <div 
             slot="title"
-            class="dialog__header">{{registerDialog.type ? 'register' : 'logIn'}}</div>
+            class="dialog__header">{{registerDialog.type ? 'Register' : 'Log In'}}</div>
         <div class="dialog__body">
             <div v-if="registerDialog.type == 1" class="dialog__body--column">
                  name
@@ -16,7 +16,7 @@
                 name="name"
                 :rules="{required:true}"
                 tag="div"
-                class="validator"
+                class="validator dialog__body--column"
                 >
                 <el-input
                 :class="{'err':errors.name && errors.name.length}"
@@ -25,13 +25,14 @@
                 </el-input>
             </ValidationProvider>
             </div>
+
            <div class="dialog__body--column">
                 e-mail
             <ValidationProvider
                 name="email"
                 :rules="{required:true,email:true}"
                 tag="div"
-                class="validator"
+                class="validator dialog__body--column"
                 >
                 <el-input
                 :class="{'err':errors.email && errors.email.length}"
@@ -43,21 +44,23 @@
            
            <div class="dialog__body--column">
                password
-             <ValidationProvider
-                name="password"
-                :rules="{required:true}"
-                tag="div"
-                class="validator"
-                >
+           </div>
+           
+            <ValidationProvider
+            name="password"
+            :rules="{required:true}"
+            tag="div"
+            class="validator dialog__body--column"
+            >
             <el-input 
                 v-model="password"
                 :show-password="true"
-                :class="{'err':errors.password && errors.password.length}">
-
+                :class="{'err':errors.password && errors.password.length}"
+                @keydown.13.native="handleSubmit(()=>registerDialog.type ? register() : logIn())">
+                
             </el-input>
-            </ValidationProvider>
-           </div>
-            
+        </ValidationProvider>
+           
         </div>
         <div class="dialog__footer">
             <div class="btn-wrap">
@@ -72,9 +75,9 @@
             </el-button>
             </div>
             
-            <div @click="resetPassword()" class="fix-content cursor-pointer hover-text-color">
+            <span @click="resetPassword()" class="operate" v-if="!registerDialog.type">
                 reset password
-                </div>
+                </span>
         </div>
     </el-dialog>
     </ValidationObserver>

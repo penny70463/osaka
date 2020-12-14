@@ -1,12 +1,12 @@
 import { updateField } from 'vuex-map-fields';
-
+import { MessageBox } from 'element-ui'
 export const state = {
 	lang:'tc',
 	passCategory: '4',
 	queryString: '',
 	tempQueryString: '',
 	markUrl: '',
-	currentPosition: { lat: '', lng: '',type:1,name: 'your location',address:'' },
+	currentPosition: { lat: '', lng: '',type:1,name: 'my location',address:'' },
 	queryDistance: 2,
 	destinations: [],
 	placesQty:0,
@@ -63,11 +63,22 @@ export const state = {
 			rate:0,
 		}
 	],
-	ratingCommentsRef:[],
+	//user go rating info
+	ratingCommentsRef:{
+			userName:'',
+			comment:'',
+			rate:0,
+		}
+	,
 	ratingCommentsRefId:'',
 	rateSum:{
 		count:0,
 		ave:0,
+	},
+	locationInfo:{
+		name:'',
+		address:'',
+		content:'',
 	}
 };
 export const mutations = {
@@ -134,6 +145,21 @@ export const mutations = {
 	},
 
 	setInfoRatingType(state,val){
+		if(val) {
+			if(!state.logInStatus) {
+				MessageBox.alert('Please Log in!','hint',{
+					confirmButtonText: 'OK',
+				})
+				return
+			} else if(state.ratingComments.some(elm=>{
+				return elm.userName == state.userInfo.name
+			})) {
+				MessageBox.alert('You have comment alredy!','hint',{
+					confirmButtonText: 'OK',
+				})
+				return
+			}
+		}
 		state.infoRatingType = val
 	},
 
@@ -159,4 +185,14 @@ export const mutations = {
 	setRateSum(state, data) {
 		state.rateSum = data
 	},
+	setLocationInfo(state, info) {
+		state.locationInfo = info
+	},
+	resetRatingCommentsRef() {
+		state.ratingCommentsRef = {
+			userName:'',
+			comment:'',
+			rate:0,
+		}
+	}
 }

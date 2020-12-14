@@ -110,6 +110,7 @@ export default {
 				//取得搜尋位置
 				if(status=='OVER_QUERY_LIMIT') {
 					MessageBox.alert('System is busy ! Please try again!','hint',{
+							confirmButtonText: 'OK',
 							callback:()=>{
 								
 							}
@@ -127,6 +128,7 @@ export default {
 					}
 					if(status==='ZERO_RESULTS') {
 						MessageBox.alert("Can't find this place, please try again!",'hint',{
+							confirmButtonText: 'OK',
 							callback:()=>{
 								this.initMap(12)
 								return;
@@ -135,6 +137,7 @@ export default {
 					}
 					if( osakaString.every( el => checkString(el, this.currPosition.address))) {
 						MessageBox.alert('This location is not in osaka ! Please search again!','hint',{
+							confirmButtonText: 'OK',
 							callback:()=>{
 								this.initMap(12)
 								return;
@@ -225,65 +228,43 @@ export default {
 		async markerInfo(marker,elm) {
 			let language=this.lang
 			let store = this.$store
+						
 			await google.maps.event.addListener(marker, 'click', function() {
-				let infowindow = new google.maps.InfoWindow({
-				});
-			let langName = language == 'tc' ? 'name' : `${language}Name`	
-			let langContent = language == 'tc' ? 'content' : `${language}Content`
-			let infoDiv = document.createElement('div')
-			infoDiv.innerHTML = elm.name ? `<div class="location-name">${elm.name}</div>`:
-				`<div class="location-name">${elm.dm.proto.fields[langName].stringValue}<div>Rating: ${store.state.Home.rateSum.ave} ( ${store.state.Home.rateSum.count} Reviews )</div></div>
-				<div class="operate-wrap">
-					<div id="rating" class="operate">Go Rating</div>
-					<div id="comments" class="operate">View Comments</div>
-				</div>
-				
-				<hr>
-				<span class="location-address">${elm.dm.proto.fields.info.mapValue.fields.address.stringValue}</span>
-				<br>
-				<span>${JSON.parse(JSON.stringify(elm.dm.proto.fields[langContent])).stringValue}</span>`
-			
-			google.maps.event.addListener(infowindow, 'domready',function( ){
-				let rating = document.getElementById('rating')
-				let comments = document.getElementById('comments')
-
+				//景點資訊
+				let langName = language == 'tc' ? 'name' : `${language}Name`	
+				let langContent = language == 'tc' ? 'content' : `${language}Content`
+				store.commit('Home/setLocationInfo', {
+					name: elm.name ? elm.name : `${elm.dm.proto.fields[langName].stringValue}`,
+					address: elm.name ? '' : `${elm.dm.proto.fields.info.mapValue.fields.address.stringValue}`,
+					content:elm.name ? '' : `${JSON.parse(JSON.stringify(elm.dm.proto.fields[langContent])).stringValue}`
+				})
+				//rating
 				let temp=[]
 				let tempAve = []
-				if(elm.dm.proto.fields.ratings && elm.dm.proto.fields.ratings.arrayValue.values) {
-					elm.dm.proto.fields.ratings.arrayValue.values.forEach(elm=>{
-						temp.push({
-							userName:elm.mapValue.fields.userName.stringValue,
-							rate:Number(elm.mapValue.fields.rate.integerValue),
-							comment:elm.mapValue.fields.comment.stringValue,
+				if(elm.name != 'my location') {
+					if(elm.dm.proto.fields.ratings && elm.dm.proto.fields.ratings.arrayValue.values) {
+						elm.dm.proto.fields.ratings.arrayValue.values.forEach(elm=>{
+							temp.push({
+								userName:elm.mapValue.fields.userName.stringValue,
+								rate:Number(elm.mapValue.fields.rate.integerValue),
+								comment:elm.mapValue.fields.comment.stringValue,
+							})
+							tempAve.push(Number(elm.mapValue.fields.rate.integerValue))
 						})
-						tempAve.push(Number(elm.mapValue.fields.rate.integerValue))
-					})
-				}
-				
+					}
+				} 
 				let average = (array) => array.reduce((a, b) => a + b) / array.length;
 				store.commit('Home/setRateSum',{
 					count:tempAve.length,
-					ave: average(tempAve).toFixed(1)
+					ave: tempAve.length ? average(tempAve).toFixed(1): ''
 				})
-				store.commit('Home/setRatingCommentsRef',temp)
+				// store.commit('Home/setRatingCommentsRef',temp)
 				store.commit('Home/setRatingCommentsRefId',elm.id)
-				rating.onclick = function() {
-					store.dispatch('Home/goRating',1)
-			}
-				comments.onclick = function() {
-					store.commit('Home/setRatingComments',temp)
-					store.dispatch('Home/goRating',0)
+				store.commit('Home/setRatingComments',temp)
+				if(elm.name != 'my location') {
+					store.commit('Home/setInfoRatingVisible',true)
 				}
-			})
-				
-			 infowindow.setContent(infoDiv);
-			infowindow.open(this.map, marker);
-			
 			});
-			
-			
-				
-			
 			
 			this.$store.commit('Home/setInitialMapSetting', {name:'center',data:{ lat:this.currPosition.lat, lng:this.currPosition.lng}})
 			 this.resetCenter();	
@@ -296,7 +277,6 @@ export default {
 						//若無info , call map API補齊
 						if(!elm.dm.proto.fields.ratings) {
 							db.collection(`2020-4-6`).doc(elm.id).update({ratings: []})
-							console.log(elm.dm.proto.fields.name)
 						}
 					
 				})
